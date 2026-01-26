@@ -7,8 +7,8 @@
         .header { border-bottom: 2px solid #FFD700; padding: 20px; margin-bottom: 30px; }
         h1 { color: #FFD700; text-shadow: 0 0 10px #FF4500; margin: 0; }
         .stats-box { display: flex; justify-content: space-around; background: #222; padding: 15px; border-radius: 10px; border: 1px solid #444; margin: 20px; }
-        .stat { font-size: 18px; color: #00BFFF; }
-        .value { font-size: 22px; font-weight: bold; color: #fff; }
+        .stat { font-size: 14px; color: #00BFFF; margin-bottom: 5px; }
+        .value { font-size: 20px; font-weight: bold; color: #fff; }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
         .card { background: #333; padding: 20px; border-radius: 10px; cursor: pointer; transition: 0.3s; border: 1px solid #555; }
         .card:hover { background: #444; border-color: #FFD700; transform: scale(1.05); }
@@ -28,31 +28,42 @@
         </div>
         <div>
             <div class="stat">💰 Gold</div>
-            <div class="value">0 G</div>
+            <div id="goldDisplay" class="value">0 G</div>
         </div>
         <div>
-            <div class="stat">💎 Token</div>
-            <div class="value">0 ADV</div>
+            <div class="stat">💸 Cash</div>
+            <div id="cashDisplay" class="value">0 KRW</div>
         </div>
     </div>
 
     <div class="menu-grid">
-        <div class="card" onclick="alert('채굴 시스템 준비 중...')">
+        <div class="card" onclick="location.href='ignition.html'">
             <span class="icon">🔥</span>
             <strong>Ignition (채굴)</strong>
         </div>
-        <div class="card" onclick="alert('거래소 준비 중...')">
+        
+        <div class="card" onclick="location.href='market.html'">
             <span class="icon">💧</span>
             <strong>Market (거래소)</strong>
         </div>
-        <div class="card" onclick="alert('연결 시스템 준비 중...')">
+        
+        <div class="card" onclick="alert('외부 연동 시스템 개발 중입니다!')">
             <span class="icon">🌬️</span>
             <strong>Connect (연동)</strong>
         </div>
-        <div class="card" onclick="alert('보안 시스템 정상')">
+        <div class="card" onclick="alert('보안 시스템 정상 작동 중')">
             <span class="icon">🌍</span>
             <strong>Security (보안)</strong>
         </div>
     </div>
+
+    <script>
+        // [M♥R] 저장된 골드와 현금을 불러오는 마법 (새로고침해도 유지됨!)
+        let savedGold = localStorage.getItem('adv_gold') ? localStorage.getItem('adv_gold') : 0;
+        let savedCash = localStorage.getItem('adv_cash') ? parseInt(localStorage.getItem('adv_cash')) : 0;
+        
+        document.getElementById('goldDisplay').innerText = savedGold + " G";
+        document.getElementById('cashDisplay').innerText = savedCash.toLocaleString() + " KRW";
+    </script>
 </body>
 </html>

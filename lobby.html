@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AdventureV : Command Center</title>
+    <style>
+        body { background-color: #0f0f0f; color: #fff; font-family: 'Courier New', monospace; text-align: center; }
+        .header { border-bottom: 2px solid #FFD700; padding: 20px; margin-bottom: 30px; }
+        h1 { color: #FFD700; text-shadow: 0 0 10px #FF4500; margin: 0; }
+        .stats-box { display: flex; justify-content: space-around; background: #222; padding: 15px; border-radius: 10px; border: 1px solid #444; margin: 20px; }
+        .stat { font-size: 18px; color: #00BFFF; }
+        .value { font-size: 22px; font-weight: bold; color: #fff; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .card { background: #333; padding: 20px; border-radius: 10px; cursor: pointer; transition: 0.3s; border: 1px solid #555; }
+        .card:hover { background: #444; border-color: #FFD700; transform: scale(1.05); }
+        .icon { font-size: 30px; display: block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>M❤️R Command Center</h1>
+        <p>System Status: <span style="color:#00ff00">ONLINE</span></p>
+    </div>
+
+    <div class="stats-box">
+        <div>
+            <div class="stat">⚡ Energy</div>
+            <div class="value">100%</div>
+        </div>
+        <div>
+            <div class="stat">💰 Gold</div>
+            <div class="value">0 G</div>
+        </div>
+        <div>
+            <div class="stat">💎 Token</div>
+            <div class="value">0 ADV</div>
+        </div>
+    </div>
+
+    <div class="menu-grid">
+        <div class="card" onclick="alert('채굴 시스템 준비 중...')">
+            <span class="icon">🔥</span>
+            <strong>Ignition (채굴)</strong>
+        </div>
+        <div class="card" onclick="alert('거래소 준비 중...')">
+            <span class="icon">💧</span>
+            <strong>Market (거래소)</strong>
+        </div>
+        <div class="card" onclick="alert('연결 시스템 준비 중...')">
+            <span class="icon">🌬️</span>
+            <strong>Connect (연동)</strong>
+        </div>
+        <div class="card" onclick="alert('보안 시스템 정상')">
+            <span class="icon">🌍</span>
+            <strong>Security (보안)</strong>
+        </div>
+    </div>
+</body>
+</html>

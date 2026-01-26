@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AdventureV : The Alchemist's Market</title>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 15px; padding: 30px; max-width: 400px; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        h2 { color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 10px; }
+        .balance-box { background: #0d1117; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #30363d; }
+        .label { font-size: 14px; color: #8b949e; }
+        .value { font-size: 24px; font-weight: bold; color: #f2cc60; }
+        .cash-value { font-size: 24px; font-weight: bold; color: #2ea043; }
+        .exchange-btn { 
+            width: 100%; padding: 15px; font-size: 18px; font-weight: bold; 
+            color: white; background: #238636; border: none; border-radius: 8px; 
+            cursor: pointer; transition: 0.2s; margin-top: 10px;
+        }
+        .exchange-btn:hover { background: #2ea043; }
+        .back-btn { background: transparent; border: 1px solid #8b949e; color: #8b949e; margin-top: 20px; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>💧 The Alchemist's Market</h2>
+        <p>골드를 현금(KRW)으로 변환합니다.</p>
+
+        <div class="balance-box">
+            <div class="label">보유 골드 (Gold)</div>
+            <div id="myGold" class="value">0 G</div>
+        </div>
+
+        <div style="font-size: 30px;">⬇️</div>
+
+        <div class="balance-box">
+            <div class="label">예상 현금 (Cash)</div>
+            <div id="estCash" class="cash-value">0 KRW</div>
+        </div>
+
+        <button class="exchange-btn" onclick="convertGold()">환전 실행 (Exchange)</button>
+        <br>
+        <button class="back-btn" onclick="location.href='lobby.html'">◀ 커맨드 센터로 복귀</button>
+    </div>
+
+    <script>
+        // [M♥R] 마법의 지갑 (localStorage) 불러오기
+        let currentGold = localStorage.getItem('adv_gold') ? parseInt(localStorage.getItem('adv_gold')) : 0;
+        let currentCash = localStorage.getItem('adv_cash') ? parseInt(localStorage.getItem('adv_cash')) : 0;
+        let exchangeRate = 100; // 1골드 = 100원 (시세 적용!)
+
+        // 화면에 표시
+        document.getElementById('myGold').innerText = currentGold + " G";
+        document.getElementById('estCash').innerText = (currentGold * exchangeRate).toLocaleString() + " KRW";
+
+        function convertGold() {
+            if (currentGold <= 0) {
+                alert("⚠️ 환전할 골드가 부족합니다! 채굴을 먼저 진행하세요.");
+                return;
+            }
+
+            // 환전 로직 (API 시뮬레이션)
+            let cashAmount = currentGold * exchangeRate;
+            
+            if(confirm(currentGold + " G를 " + cashAmount.toLocaleString() + "원으로 환전하시겠습니까?")) {
+                currentCash += cashAmount;
+                currentGold = 0; // 골드 소진
+
+                // 데이터 저장
+                localStorage.setItem('adv_gold', currentGold);
+                localStorage.setItem('adv_cash', currentCash);
+
+                alert("✅ 환전 완료! " + cashAmount.toLocaleString() + "원이 입금되었습니다.");
+                location.reload(); // 새로고침
+            }
+        }
+    </script>
+</body>
+</html>

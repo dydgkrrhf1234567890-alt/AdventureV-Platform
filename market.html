@@ -1,75 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AdventureV : The Alchemist's Market</title>
+    <title>AdventureV : Crypto Market</title>
     <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; }
+        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
         .card { background: #161b22; border: 1px solid #30363d; border-radius: 15px; padding: 30px; max-width: 400px; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        h2 { color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 10px; }
+        h2 { color: #f2cc60; border-bottom: 2px solid #30363d; padding-bottom: 10px; }
         .balance-box { background: #0d1117; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #30363d; }
         .label { font-size: 14px; color: #8b949e; }
-        .value { font-size: 24px; font-weight: bold; color: #f2cc60; }
-        .cash-value { font-size: 24px; font-weight: bold; color: #2ea043; }
-        .exchange-btn { 
+        .value { font-size: 24px; font-weight: bold; color: #fff; }
+        
+        /* 메타마스크 버튼 스타일 */
+        .connect-btn { 
             width: 100%; padding: 15px; font-size: 18px; font-weight: bold; 
-            color: white; background: #238636; border: none; border-radius: 8px; 
-            cursor: pointer; transition: 0.2s; margin-top: 10px;
+            color: #000; background: #f6851b; /* 메타마스크 주황색 */
+            border: none; border-radius: 8px; 
+            cursor: pointer; transition: 0.2s; margin-top: 10px; display: flex; align-items: center; justify-content: center;
         }
-        .exchange-btn:hover { background: #2ea043; }
+        .connect-btn:hover { background: #e2761b; transform: scale(1.02); }
+        .connect-btn img { width: 24px; margin-right: 10px; }
+        
         .back-btn { background: transparent; border: 1px solid #8b949e; color: #8b949e; margin-top: 20px; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .wallet-address { font-size: 12px; color: #2ea043; margin-top: 10px; word-break: break-all; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>💧 The Alchemist's Market</h2>
-        <p>골드를 현금(KRW)으로 변환합니다.</p>
+        <h2>🦊 Web3 Crypto Market</h2>
+        <p>골드를 코인(ETH/MATIC)으로 교환합니다.</p>
 
         <div class="balance-box">
             <div class="label">보유 골드 (Gold)</div>
             <div id="myGold" class="value">0 G</div>
         </div>
 
-        <div style="font-size: 30px;">⬇️</div>
-
         <div class="balance-box">
-            <div class="label">예상 현금 (Cash)</div>
-            <div id="estCash" class="cash-value">0 KRW</div>
+            <div class="label">지갑 연결 상태</div>
+            <div id="walletStatus" class="value" style="color: #ff6b6b; font-size: 18px;">연결되지 않음</div>
+            <div id="myAddress" class="wallet-address"></div>
         </div>
 
-        <button class="exchange-btn" onclick="convertGold()">환전 실행 (Exchange)</button>
+        <button class="connect-btn" onclick="connectWallet()">
+            🦊 지갑 연결 & 환전 신청
+        </button>
+        
         <br>
         <button class="back-btn" onclick="location.href='lobby.html'">◀ 커맨드 센터로 복귀</button>
     </div>
 
     <script>
-        // [M♥R] 마법의 지갑 (localStorage) 불러오기
         let currentGold = localStorage.getItem('adv_gold') ? parseInt(localStorage.getItem('adv_gold')) : 0;
-        let currentCash = localStorage.getItem('adv_cash') ? parseInt(localStorage.getItem('adv_cash')) : 0;
-        let exchangeRate = 100; // 1골드 = 100원 (시세 적용!)
-
-        // 화면에 표시
         document.getElementById('myGold').innerText = currentGold + " G";
-        document.getElementById('estCash').innerText = (currentGold * exchangeRate).toLocaleString() + " KRW";
 
-        function convertGold() {
-            if (currentGold <= 0) {
-                alert("⚠️ 환전할 골드가 부족합니다! 채굴을 먼저 진행하세요.");
-                return;
-            }
+        // [M♥R] 메타마스크 연결 마법 함수
+        async function connectWallet() {
+            // 1. 메타마스크가 설치되어 있는지 확인
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // 2. 지갑 연결 요청 (여기가 핵심!)
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0]; // 연결된 첫 번째 지갑 주소
 
-            // 환전 로직 (API 시뮬레이션)
-            let cashAmount = currentGold * exchangeRate;
-            
-            if(confirm(currentGold + " G를 " + cashAmount.toLocaleString() + "원으로 환전하시겠습니까?")) {
-                currentCash += cashAmount;
-                currentGold = 0; // 골드 소진
+                    // 3. 화면에 주소 표시
+                    document.getElementById('walletStatus').innerText = "✅ 연결됨 (Active)";
+                    document.getElementById('walletStatus').style.color = "#2ea043";
+                    document.getElementById('myAddress').innerText = account;
 
-                // 데이터 저장
-                localStorage.setItem('adv_gold', currentGold);
-                localStorage.setItem('adv_cash', currentCash);
+                    // 4. 환전 로직 (실제 전송은 스마트 컨트랙트 필요하지만, 여기선 연결 성공 메시지)
+                    if(currentGold > 0) {
+                        alert("🎉 지갑 연결 성공!\n\n내 지갑 주소: " + account + "\n\n현재 보유한 " + currentGold + "G에 대한 코인 지급 요청이 전송되었습니다!");
+                    } else {
+                        alert("⚠️ 지갑은 연결되었지만, 환전할 골드가 없습니다!");
+                    }
 
-                alert("✅ 환전 완료! " + cashAmount.toLocaleString() + "원이 입금되었습니다.");
-                location.reload(); // 새로고침
+                } catch (error) {
+                    alert("❌ 연결 거부됨: " + error.message);
+                }
+            } else {
+                // 메타마스크가 없을 때
+                alert("🦊 메타마스크(MetaMask) 앱이 필요합니다!\n앱스토어에서 설치해주세요.");
+                window.open('https://metamask.io/download.html');
             }
         }
     </script>

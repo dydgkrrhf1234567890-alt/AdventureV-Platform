@@ -6,7 +6,8 @@
         body { background-color: #000; color: #fff; text-align: center; font-family: sans-serif; margin-top: 20%; }
         h1 { font-size: 50px; color: #FFD700; text-shadow: 0 0 20px #FF4500; }
         p { font-size: 20px; color: #00BFFF; }
-        .btn { padding: 15px 30px; font-size: 20px; background: #FF4500; color: white; border: none; border-radius: 10px; cursor: pointer; }
+        .btn { padding: 15px 30px; font-size: 20px; background: #FF4500; color: white; border: none; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #FFD700; color: #000; transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -14,6 +15,6 @@
     <p>Genesis System : Online</p>
     <p>가상과 현실을 잇는 디지털 연금술의 시작</p>
     <br>
-    <button class="btn" onclick="alert('시스템이 정상 가동 중입니다! 환영합니다, 왕자님!')">시스템 접속 (Connect)</button>
+    <button class="btn" onclick="location.href='lobby.html'">시스템 접속 (Connect)</button>
 </body>
 </html>

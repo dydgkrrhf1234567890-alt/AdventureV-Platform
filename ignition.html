@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AdventureV : Ignition</title>
+    <style>
+        body { background-color: #1a1a1a; color: #fff; text-align: center; font-family: sans-serif; user-select: none; }
+        .counter { font-size: 60px; color: #FFD700; margin-top: 50px; text-shadow: 0 0 20px #FF4500; }
+        .mining-btn { 
+            width: 200px; height: 200px; 
+            border-radius: 50%; 
+            background: radial-gradient(circle, #ff6b6b, #c0392b); 
+            border: 5px solid #fff; 
+            font-size: 24px; color: white; font-weight: bold;
+            cursor: pointer; box-shadow: 0 0 30px #ff4757;
+            transition: 0.1s; margin-top: 30px;
+        }
+        .mining-btn:active { transform: scale(0.95); box-shadow: 0 0 10px #ff4757; }
+        .back-btn { margin-top: 50px; padding: 10px 20px; background: #333; color: #aaa; border: 1px solid #555; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>🔥 Project Ignition 🔥</h2>
+    <p>터치해서 골드를 채굴하세요!</p>
+    
+    <div class="counter"><span id="score">0</span> G</div>
+    
+    <button class="mining-btn" onclick="mine()">MINE!</button>
+    <br>
+    <button class="back-btn" onclick="location.href='lobby.html'">◀ 커맨드 센터로 복귀</button>
+
+    <script>
+        // 저장된 골드 불러오기
+        let gold = localStorage.getItem('adv_gold') ? parseInt(localStorage.getItem('adv_gold')) : 0;
+        document.getElementById('score').innerText = gold;
+
+        function mine() {
+            gold += 10; // 10골드씩 채굴!
+            document.getElementById('score').innerText = gold;
+            localStorage.setItem('adv_gold', gold); // 저장!
+            
+            // 진동 (모바일)
+            if (navigator.vibrate) navigator.vibrate(50); 
+        }
+    </script>
+</body>
+</html>

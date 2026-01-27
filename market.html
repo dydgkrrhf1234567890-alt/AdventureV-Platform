@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AdventureV : Crypto Market</title>
+    <title>AdventureV : Total Market</title>
     <style>
         body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
         .card { background: #161b22; border: 1px solid #30363d; border-radius: 15px; padding: 30px; max-width: 400px; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
@@ -10,25 +10,28 @@
         .label { font-size: 14px; color: #8b949e; }
         .value { font-size: 24px; font-weight: bold; color: #fff; }
         .crypto-value { font-size: 24px; font-weight: bold; color: #00d2ff; text-shadow: 0 0 10px rgba(0, 210, 255, 0.5); }
-        
-        .connect-btn { 
-            width: 100%; padding: 15px; font-size: 18px; font-weight: bold; 
-            color: #000; background: #f6851b; 
-            border: none; border-radius: 8px; 
-            cursor: pointer; transition: 0.2s; margin-top: 10px; display: flex; align-items: center; justify-content: center;
-        }
-        .connect-btn:hover { background: #e2761b; transform: scale(1.02); }
-        .back-btn { background: transparent; border: 1px solid #8b949e; color: #8b949e; margin-top: 20px; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
         .wallet-address { font-size: 11px; color: #2ea043; margin-top: 10px; word-break: break-all; background: #000; padding: 5px; border-radius: 5px; }
+
+        .btn { 
+            width: 100%; padding: 15px; font-size: 16px; font-weight: bold; 
+            border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 10px; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .connect-btn { color: #000; background: #f6851b; } /* 연결 (주황) */
+        .shop-btn { color: #fff; background: #1f6feb; }     /* 쇼핑 (파랑) */
+        .shop-btn:hover { background: #388bfd; transform: scale(1.02); }
+        .withdraw-btn { color: #fff; background: #238636; } /* 출금 (초록) */
+        .withdraw-btn:hover { background: #2ea043; transform: scale(1.02); }
+        .back-btn { background: transparent; border: 1px solid #8b949e; color: #8b949e; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>🦊 Web3 Bank</h2>
-        <p>내 지갑의 실제 자산을 조회합니다.</p>
+        <h2>🦊 AdventureV Exchange</h2>
+        <p>쇼핑(결제)과 환전(출금)을 동시에!</p>
 
         <div class="balance-box">
-            <div class="label">내 게임 골드 (Game Money)</div>
+            <div class="label">내 게임 골드 (Game Gold)</div>
             <div id="myGold" class="value">0 G</div>
         </div>
 
@@ -38,48 +41,86 @@
             <div id="myAddress" class="wallet-address">지갑을 연결해주세요</div>
         </div>
 
-        <button class="connect-btn" onclick="connectWallet()">
-            🦊 지갑 연결 & 잔고 조회
+        <button class="btn connect-btn" onclick="connectWallet()">
+            🦊 1. 지갑 연결 (Connect)
+        </button>
+
+        <button class="btn shop-btn" onclick="payForItem()">
+            🛒 2. 아이템 구매 (0.0001 ETH)
+        </button>
+
+        <button class="btn withdraw-btn" onclick="requestWithdraw()">
+            📥 3. 골드 출금 신청 (Claim)
         </button>
         
         <br>
-        <button class="back-btn" onclick="location.href='lobby.html'">◀ 커맨드 센터로 복귀</button>
+        <button class="btn back-btn" onclick="location.href='lobby.html'">◀ 커맨드 센터로 복귀</button>
     </div>
 
     <script>
+        // [설정] 여기에 왕자님의 지갑 주소를 넣으면, 쇼핑한 돈이 왕자님께 들어와요!
+        // 지금은 테스트를 위해 '접속한 사람 본인'에게 보내게 해뒀어요. (안전 제일!)
+        let adminWallet = null; 
+
         let currentGold = localStorage.getItem('adv_gold') ? parseInt(localStorage.getItem('adv_gold')) : 0;
         document.getElementById('myGold').innerText = currentGold + " G";
+        let userAccount = null;
 
         async function connectWallet() {
             if (typeof window.ethereum !== 'undefined') {
                 try {
-                    // 1. 지갑 연결 요청
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
+                    userAccount = accounts[0];
+                    adminWallet = userAccount; // (테스트용) 돈 받는 사람 = 나 자신
 
-                    // 2. 잔고 조회 요청 (여기가 핵심!)
-                    // 'eth_getBalance'는 블록체인에 잔고를 물어보는 명령어예요.
-                    const balanceHex = await window.ethereum.request({
-                        method: 'eth_getBalance',
-                        params: [account, 'latest']
-                    });
-
-                    // 3. 16진수를 우리가 아는 숫자로 변환 (Wei -> Ether)
-                    // 코인 세계에서는 소수점 18자리를 쓰기 때문에 계산이 필요해요.
-                    const balanceWei = parseInt(balanceHex, 16);
-                    const balanceEth = balanceWei / Math.pow(10, 18);
-
-                    // 4. 화면에 표시
-                    document.getElementById('cryptoBalance').innerText = balanceEth.toFixed(4) + " ETH/MATIC";
-                    document.getElementById('myAddress').innerText = account;
+                    const balanceHex = await window.ethereum.request({ method: 'eth_getBalance', params: [userAccount, 'latest'] });
+                    const balanceEth = parseInt(balanceHex, 16) / Math.pow(10, 18);
                     
-                    alert("✅ 스캔 완료!\n왕자님의 지갑 잔고를 확인했습니다.");
-
+                    document.getElementById('cryptoBalance').innerText = balanceEth.toFixed(4) + " ETH";
+                    document.getElementById('myAddress').innerText = userAccount;
+                    alert("✅ 연결 완료!");
                 } catch (error) {
-                    alert("❌ 오류 발생: " + error.message);
+                    alert("❌ 오류: " + error.message);
                 }
             } else {
-                alert("🦊 메타마스크 앱 내 브라우저에서 실행해주세요!");
+                alert("🦊 메타마스크 앱 브라우저에서 실행해주세요!");
+            }
+        }
+
+        // [기능 1] 쇼핑하기 (내 지갑 -> 상점) : 진짜 돈이 나갑니다!
+        async function payForItem() {
+            if (!userAccount) return alert("지갑을 먼저 연결해주세요!");
+
+            try {
+                // 0.0001 ETH (약 300원) 결제 요청
+                // *주의* 진짜로 가스비(수수료)가 나갑니다!
+                const transactionParameters = {
+                    to: adminWallet, // 돈 받을 사람 (지금은 나 자신)
+                    from: userAccount, // 돈 낼 사람
+                    value: '0x5AF3107A4000', // 0.0001 ETH를 16진수로 바꾼 값
+                };
+
+                await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [transactionParameters],
+                });
+                
+                alert("🛒 [결제 성공] 아이템 구매가 완료되었습니다!");
+
+            } catch (error) {
+                alert("결제 취소/실패: " + error.message);
+            }
+        }
+
+        // [기능 2] 출금하기 (골드 -> 내 지갑) : 요청서를 보냅니다!
+        function requestWithdraw() {
+            if (!userAccount) return alert("지갑을 먼저 연결해주세요!");
+            if (currentGold <= 0) return alert("출금할 골드가 없습니다!");
+
+            if(confirm(currentGold + " G를 출금 신청하시겠습니까?")) {
+                alert("🎉 [신청 완료] 서버로 전송되었습니다. (추후 토큰 발행 시 입금 예정)");
+                localStorage.setItem('adv_gold', 0);
+                document.getElementById('myGold').innerText = "0 G";
             }
         }
     </script>

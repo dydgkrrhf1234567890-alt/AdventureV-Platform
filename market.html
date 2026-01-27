@@ -1,124 +1,110 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AdventureV : Central Bank</title>
+    <title>AdventureV : Imperial Mall</title>
     <style>
         body { background-color: #05090c; color: #c9d1d9; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .card { background: #161b22; border: 2px solid #00d2ff; border-radius: 15px; padding: 30px; max-width: 450px; margin: 0 auto; box-shadow: 0 0 30px rgba(0, 210, 255, 0.2); }
-        h2 { color: #00d2ff; border-bottom: 2px solid #30363d; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-        .sub-title { color: #8b949e; font-size: 14px; margin-bottom: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
         
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-box { background: #0d1117; padding: 15px; border-radius: 10px; border: 1px solid #30363d; }
-        .label { font-size: 12px; color: #8b949e; margin-bottom: 5px; }
-        .value { font-size: 18px; font-weight: bold; color: #fff; }
-        .advc-value { color: #00d2ff; text-shadow: 0 0 10px rgba(0, 210, 255, 0.5); font-size: 22px; }
+        /* 은행 스타일 */
+        .bank-card { background: #161b22; border: 2px solid #00d2ff; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0, 210, 255, 0.2); }
+        h2 { color: #00d2ff; border-bottom: 2px solid #30363d; padding-bottom: 10px; margin-top: 0; }
+        .balance-display { font-size: 28px; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); margin: 10px 0; }
+        .unit { color: #00d2ff; font-size: 18px; }
 
-        .btn { 
-            width: 100%; padding: 15px; font-size: 16px; font-weight: bold; 
-            border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-top: 10px; 
-            display: flex; align-items: center; justify-content: center;
-        }
-        .connect-btn { color: #000; background: #f6851b; } 
-        .mint-btn { color: #fff; background: linear-gradient(90deg, #00d2ff, #007bff); box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
-        .mint-btn:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(0, 210, 255, 0.6); }
-        .back-btn { background: transparent; border: 1px solid #8b949e; color: #8b949e; }
+        /* 상점 스타일 */
+        .shop-title { color: #f2cc60; font-size: 22px; margin: 30px 0 15px 0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #f2cc60; display: inline-block; padding-bottom: 5px; }
         
-        .wallet-address { font-size: 11px; color: #2ea043; margin-top: 5px; word-break: break-all; }
+        .item-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .item-card { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; }
+        .item-card:hover { transform: translateY(-3px); border-color: #f2cc60; box-shadow: 0 5px 15px rgba(242, 204, 96, 0.1); }
+        
+        .item-info { text-align: left; }
+        .item-name { font-weight: bold; font-size: 16px; color: #fff; }
+        .item-desc { font-size: 12px; color: #8b949e; }
+        .item-price { color: #f2cc60; font-weight: bold; font-size: 14px; margin-top: 5px; }
+
+        .buy-btn { 
+            background: #238636; color: #fff; border: none; padding: 8px 15px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;
+        }
+        .buy-btn:hover { background: #2ea043; }
+        .buy-btn:disabled { background: #30363d; color: #8b949e; cursor: not-allowed; }
+
+        .back-btn { background: transparent; border: 1px solid #8b949e; color: #8b949e; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 30px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>💎 ADVC Central Bank</h2>
-        <p class="sub-title">AdventureV Crystal Official Minting Site</p>
-
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div class="label">심볼 (Symbol)</div>
-                <div class="value" style="color:#f2cc60;">ADVC</div>
+    <div class="container">
+        <div class="bank-card">
+            <h2>💎 My Wallet</h2>
+            <div class="balance-display">
+                <span id="myADVC">0</span> <span class="unit">ADVC</span>
             </div>
-            <div class="stat-box">
-                <div class="label">총 발행량 (Total Supply)</div>
-                <div class="value">7,777,777,777</div>
-            </div>
+            <div style="font-size: 12px; color: #8b949e;">제국 공인 화폐 (AdventureV Crystal)</div>
         </div>
 
-        <div class="stat-box" style="margin-bottom: 20px; border-color: #00d2ff;">
-            <div class="label">내 보유량 (My Balance)</div>
-            <div id="myADVC" class="advc-value">0 ADVC</div>
-            <div class="label" style="margin-top:5px;">교환 가능 골드: <span id="myGold" style="color:#f2cc60;">0 G</span></div>
-        </div>
-
-        <div id="wallet-section">
-            <button class="btn connect-btn" onclick="connectWallet()">
-                🦊 1. 지갑 연결 (Connect)
-            </button>
-            <div id="myAddress" class="wallet-address"></div>
-        </div>
-
-        <button class="btn mint-btn" onclick="mintToken()">
-            💎 2. ADVC 토큰 발행 & 수령 (Mint)
-        </button>
+        <div class="shop-title">🛍️ Imperial Shop</div>
         
-        <br>
-        <button class="btn back-btn" onclick="location.href='lobby.html'">◀ 커맨드 센터로 복귀</button>
+        <div class="item-grid">
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-name">💊 각성의 물약</div>
+                    <div class="item-desc">피로를 회복하고 집중력을 높입니다.</div>
+                    <div class="item-price">💎 100 ADVC</div>
+                </div>
+                <button class="buy-btn" onclick="buyItem(100, '각성의 물약')">구매</button>
+            </div>
+
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-name">⚔️ 드래곤 슬레이어</div>
+                    <div class="item-desc">용의 가죽도 뚫는 전설의 검입니다.</div>
+                    <div class="item-price">💎 500 ADVC</div>
+                </div>
+                <button class="buy-btn" onclick="buyItem(500, '드래곤 슬레이어')">구매</button>
+            </div>
+
+            <div class="item-card" style="border-color: #a371f7;">
+                <div class="item-info">
+                    <div class="item-name" style="color: #a371f7;">🔮 마리네의 비밀 상자</div>
+                    <div class="item-desc">무엇이 들어있을지 모르는 신비한 상자!</div>
+                    <div class="item-price">💎 1,000 ADVC</div>
+                </div>
+                <button class="buy-btn" onclick="buyItem(1000, '마리네의 비밀 상자')">구매</button>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="location.href='lobby.html'">◀ 로비로 나가기</button>
     </div>
 
     <script>
-        // [M♥R] 조폐국 설정 (Token Config)
-        const TOKEN_NAME = "AdventureV Crystal";
-        const TOKEN_SYMBOL = "ADVC";
-        const TOTAL_SUPPLY = 7777777777;
-        const EXCHANGE_RATE = 10; // 1 골드 = 10 ADVC (혜자로운 환율!)
-
         // 데이터 불러오기
-        let currentGold = localStorage.getItem('adv_gold') ? parseInt(localStorage.getItem('adv_gold')) : 0;
         let myADVC = localStorage.getItem('adv_token_advc') ? parseInt(localStorage.getItem('adv_token_advc')) : 0;
-        let userAccount = null;
-
+        
         // 화면 초기화
-        document.getElementById('myGold').innerText = currentGold + " G";
-        document.getElementById('myADVC').innerText = myADVC.toLocaleString() + " " + TOKEN_SYMBOL;
+        updateDisplay();
 
-        // 1. 지갑 연결 함수
-        async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAccount = accounts[0];
-                    document.getElementById('myAddress').innerText = "지갑: " + userAccount;
-                    alert("✅ " + TOKEN_NAME + " 조폐국에 오신 것을 환영합니다!");
-                } catch (error) {
-                    alert("❌ 오류: " + error.message);
-                }
-            } else {
-                alert("🦊 메타마스크 앱이 필요합니다.");
-            }
+        function updateDisplay() {
+            document.getElementById('myADVC').innerText = myADVC.toLocaleString();
         }
 
-        // 2. 토큰 발행(Mint) 함수 - 여기가 핵심!
-        function mintToken() {
-            if (!userAccount) return alert("먼저 지갑을 연결해주세요!");
-            if (currentGold <= 0) return alert("변환할 골드가 없습니다! 채굴을 먼저 해주세요.");
-
-            // 환전 계산
-            let mintAmount = currentGold * EXCHANGE_RATE;
-
-            if(confirm("보유한 " + currentGold + " G를 소각하고\n\n💎 " + mintAmount.toLocaleString() + " " + TOKEN_SYMBOL + "를 발행하시겠습니까?")) {
-                
-                // [시뮬레이션] 블록체인 기록 (실제로는 여기서 Smart Contract 호출)
-                myADVC += mintAmount;
-                currentGold = 0;
-
-                // 데이터 저장
-                localStorage.setItem('adv_gold', currentGold);
-                localStorage.setItem('adv_token_advc', myADVC);
-
-                // 화면 갱신
-                document.getElementById('myGold').innerText = "0 G";
-                document.getElementById('myADVC').innerText = myADVC.toLocaleString() + " " + TOKEN_SYMBOL;
-
-                alert("🎉 [발행 성공] 축하합니다!\n\n" + mintAmount.toLocaleString() + " ADVC가 국장님의 계좌로 발행되었습니다.\n(현재는 앱 내 지갑에 안전하게 보관됩니다.)");
+        // [M♥R] 쇼핑 로직 (핵심!)
+        function buyItem(price, itemName) {
+            if (myADVC >= price) {
+                if(confirm("💎 " + price + " ADVC를 지불하고\n[" + itemName + "]을(를) 구매하시겠습니까?")) {
+                    // 결제 처리 (돈 차감)
+                    myADVC -= price;
+                    localStorage.setItem('adv_token_advc', myADVC);
+                    
+                    // 화면 갱신
+                    updateDisplay();
+                    
+                    // 성공 메시지
+                    alert("🎉 구매 성공!!\n\n[" + itemName + "]이(가) 인벤토리에 보관되었습니다.\n(남은 잔액: " + myADVC + " ADVC)");
+                }
+            } else {
+                alert("❌ 잔액 부족!\n\n국장님, 돈이 부족합니다.\n채굴을 더 해서 ADVC를 발행해주세요!");
             }
         }
     </script>

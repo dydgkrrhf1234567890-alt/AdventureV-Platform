@@ -18,40 +18,36 @@
             align-items: center;
             min-height: 100vh;
             background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
-            user-select: none; /* 드래그 방지 (게임용) */
+            user-select: none;
         }
         h1 { font-size: 2.0rem; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; }
         
         .container { width: 90%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
 
-        /* 🏆 점수판 (Score Board) */
+        /* 🏆 점수판 */
         .score-board {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: #ffd700;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px #ffd700;
-            border: 1px solid #333;
-            padding: 10px 20px;
-            border-radius: 10px;
-            background: rgba(0,0,0,0.8);
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px #ffd700;
+            font-weight: bold;
         }
+        .score-sub { color: #666; font-size: 0.8rem; margin-bottom: 20px; }
 
-        /* 🔮 AI 코어 (클릭 버튼) */
+        /* 🔮 AI 코어 (채굴 버튼) */
         .ai-core {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             background: radial-gradient(circle, #ff00ff 0%, #000000 80%);
-            box-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+            box-shadow: 0 0 30px #ff00ff;
             margin-bottom: 20px;
             animation: pulse 2s infinite ease-in-out;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
             transition: transform 0.1s;
         }
-        
-        /* 클릭 효과 */
-        .ai-core:active { transform: scale(0.9); box-shadow: 0 0 60px #ff00ff; }
+        .ai-core:active { transform: scale(0.9); box-shadow: 0 0 80px #ff00ff; }
 
         @keyframes pulse {
             0% { transform: scale(1); opacity: 0.9; }
@@ -59,14 +55,27 @@
             100% { transform: scale(1); opacity: 0.9; }
         }
 
-        /* 🦊 지갑 연결 버튼 */
+        /* 💰 인출 버튼 (처음엔 숨김) */
+        #claim-btn {
+            display: none; /* 숨김 상태 */
+            width: 100%; padding: 15px; margin-bottom: 20px;
+            background: #ffd700; color: #000; border: none;
+            font-weight: bold; font-size: 1.1rem; border-radius: 10px;
+            box-shadow: 0 0 20px #ffd700; cursor: pointer;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* 기타 버튼들 */
         .btn-connect {
-            width: 100%; padding: 12px; margin-bottom: 10px;
+            width: 100%; padding: 10px; margin-bottom: 10px;
             background: transparent; border: 1px solid #f6851b; color: #f6851b;
             font-weight: bold; border-radius: 5px; cursor: pointer;
         }
-        
-        /* 일반 버튼 */
         .btn {
             display: block; width: 100%; padding: 12px 0; margin: 5px 0;
             background: transparent; border: 1px solid #333; color: #888;
@@ -86,40 +95,54 @@
         <h1>ADVC MINER</h1>
         
         <div class="score-board" id="score-display">0 ADVC</div>
-        <div style="color: #666; font-size: 0.8rem; margin-bottom: 10px;">Tap the Core to Mine! (코어를 눌러 채굴하세요!)</div>
+        <div class="score-sub">Target: 10 ADVC to Claim (10개 모으면 인출 가능)</div>
+
+        <button id="claim-btn" onclick="requestClaim()">
+            💰 Claim Reward (코인으로 받기)
+        </button>
 
         <div class="ai-core" onclick="mineToken()"></div>
 
         <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0; width: 100%;">
 
-        <a href="https://quickswap.exchange/#/swap?outputCurrency=0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn">🦄 Buy ADVC (상점)</a>
-        <a href="https://t.me/advc_official" target="_blank" class="btn">📢 Telegram (광장)</a>
+        <a href="https://quickswap.exchange/#/swap?outputCurrency=0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn">🦄 Buy ADVC</a>
+        <a href="https://t.me/advc_official" target="_blank" class="btn">📢 Telegram</a>
     </div>
 
     <script>
-        let score = 0; // 게임 점수
+        let score = 0;
+        const targetScore = 10; // 목표 점수
 
-        // 1. 채굴 함수 (클릭 게임 로직)
+        // 1. 채굴 함수
         function mineToken() {
-            score += 1; // 점수 1 증가
+            score += 1;
             document.getElementById("score-display").innerText = score + " ADVC";
             
-            // 진동 효과 (모바일 전용)
-            if (navigator.vibrate) navigator.vibrate(50);
+            // 10점이 넘으면 인출 버튼 등장!
+            if (score >= targetScore) {
+                document.getElementById("claim-btn").style.display = "block";
+                document.getElementById("score-display").style.color = "#00ff00"; // 점수 색깔 변경
+            }
+
+            if (navigator.vibrate) navigator.vibrate(30);
         }
 
-        // 2. 지갑 연결 함수
+        // 2. 인출 요청 함수 (아직 은행 없음)
+        function requestClaim() {
+            alert("🚧 [System Notice]\n\n아직 'ADVC 보상 금고(Smart Contract)'가 건설되지 않았습니다.\n\n추후 업데이트를 통해 진짜 지갑으로 전송될 예정입니다!\n(Current Status: Mining Test Mode)");
+        }
+
+        // 3. 지갑 연결
         async function connectWallet() {
             const btn = document.getElementById("connect-btn");
             if (window.ethereum) {
                 try {
-                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-                    btn.innerText = "✅ Wallet Linked (연결됨)";
+                    await window.ethereum.request({ method: "eth_requestAccounts" });
+                    btn.innerText = "✅ Wallet Connected";
                     btn.style.borderColor = "#00ffcc";
                     btn.style.color = "#00ffcc";
-                    alert("Commander! Mining Protocol Started.");
                 } catch (error) { alert("연결 실패"); }
-            } else { alert("메타마스크 앱에서 실행하세요!"); }
+            } else { alert("메타마스크 앱을 사용해주세요!"); }
         }
     </script>
 

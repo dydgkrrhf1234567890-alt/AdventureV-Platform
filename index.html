@@ -20,29 +20,49 @@
             background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
         }
         h1 { font-size: 2.2rem; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; letter-spacing: 2px; }
-        p.subtitle { font-size: 1rem; color: #888; margin-bottom: 30px; }
+        p.subtitle { font-size: 0.9rem; color: #888; margin-bottom: 20px; }
         
-        .container { width: 90%; max-width: 400px; padding: 20px; }
+        .container { width: 90%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
 
-        /* 오라클 박스 (AI 대화창) */
+        /* 🔮 AI 코어 (심장) 애니메이션 */
+        .ai-core {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff00ff 0%, #000000 70%);
+            box-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #00ffcc;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite ease-in-out;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 20px #ff00ff; opacity: 0.8; }
+            50% { transform: scale(1.1); box-shadow: 0 0 50px #ff00ff, 0 0 80px #00ffcc; opacity: 1; }
+            100% { transform: scale(0.95); box-shadow: 0 0 20px #ff00ff; opacity: 0.8; }
+        }
+
+        /* 오라클 박스 */
         .oracle-box {
+            width: 100%;
             border: 1px solid #333;
-            background: rgba(0, 255, 204, 0.05);
+            background: rgba(0, 0, 0, 0.6);
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             border-radius: 10px;
-            min-height: 100px; /* 두 줄이라 조금 더 높게 */
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+            backdrop-filter: blur(5px);
         }
         #oracle-text { 
             font-size: 1.0rem; 
             color: #fff; 
             font-weight: bold; 
-            line-height: 1.6; /* 줄 간격 넓게 */
-            white-space: pre-line; /* 줄바꿈 허용 */
+            line-height: 1.6; 
+            white-space: pre-line;
         }
 
         /* 버튼 스타일 */
@@ -59,11 +79,15 @@
             border-radius: 5px;
             transition: 0.3s;
             cursor: pointer;
+            font-weight: bold;
         }
         .btn:hover { background: #00ffcc; color: #000; box-shadow: 0 0 15px #00ffcc; transform: translateY(-2px); }
         
-        .btn-magic { border-color: #ff00ff; color: #ff00ff; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
-        .btn-magic:hover { background: #ff00ff; color: #fff; box-shadow: 0 0 20px #ff00ff; }
+        .btn-magic { 
+            border-color: #ff00ff; color: #ff00ff; 
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+        .btn-magic:hover { background: #ff00ff; color: #fff; box-shadow: 0 0 30px #ff00ff; }
         
         .btn-gold { border-color: #ffd700; color: #ffd700; }
         .btn-gold:hover { background: #ffd700; color: #000; box-shadow: 0 0 20px #ffd700; }
@@ -74,18 +98,20 @@
 <body>
 
     <div class="container">
+        <div class="ai-core" id="ai-visual"></div>
+
         <h1>ADVC EMPIRE</h1>
-        <p class="subtitle">Humanoid x Human Hybrid Interface</p>
+        <p class="subtitle">Connected to Neural Network...</p>
 
         <div class="oracle-box">
-            <span id="oracle-text">"System Ready...<br>시스템이 준비되었습니다."</span>
+            <span id="oracle-text">"System Online.<br>명령을 기다리고 있습니다."</span>
         </div>
 
         <button onclick="askOracle()" class="btn btn-magic">
-            🔮 Ask Humanoid Oracle
+            🔮 Activate Oracle
         </button>
 
-        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0; width: 100%;">
 
         <a href="https://quickswap.exchange/#/swap?outputCurrency=0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn btn-gold">
             🦄 Buy ADVC (QuickSwap)
@@ -106,7 +132,7 @@
     </div>
 
     <script>
-        // 🤖 휴머노이드 융합 언어 데이터베이스 (영어 + 한글)
+        // 🤖 V5 하이브리드 데이터베이스
         const messages = [
             "🤖: HODL is the only way.\n(존버만이 승리하는 길입니다.)",
             "🤖: The Empire is watching.\n(제국이 당신을 지켜보고 있습니다.)",
@@ -122,12 +148,17 @@
 
         function askOracle() {
             const textBox = document.getElementById("oracle-text");
+            const core = document.getElementById("ai-visual");
+            
+            // 말할 때 시각적 효과 (깜빡임 가속)
             textBox.style.opacity = 0; 
+            core.style.animationDuration = "0.2s"; // 빠르게 뜀
             
             setTimeout(() => {
                 const randomMsg = messages[Math.floor(Math.random() * messages.length)];
                 textBox.innerText = randomMsg;
                 textBox.style.opacity = 1;
+                core.style.animationDuration = "2s"; // 다시 평온하게
             }, 300);
         }
     </script>

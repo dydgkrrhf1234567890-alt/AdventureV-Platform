@@ -31,13 +31,19 @@
             padding: 20px;
             margin-bottom: 30px;
             border-radius: 10px;
-            min-height: 80px;
+            min-height: 100px; /* 두 줄이라 조금 더 높게 */
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
         }
-        #oracle-text { font-size: 1.1rem; color: #fff; font-weight: bold; font-style: italic; }
+        #oracle-text { 
+            font-size: 1.0rem; 
+            color: #fff; 
+            font-weight: bold; 
+            line-height: 1.6; /* 줄 간격 넓게 */
+            white-space: pre-line; /* 줄바꿈 허용 */
+        }
 
         /* 버튼 스타일 */
         .btn {
@@ -56,7 +62,6 @@
         }
         .btn:hover { background: #00ffcc; color: #000; box-shadow: 0 0 15px #00ffcc; transform: translateY(-2px); }
         
-        /* 특별 버튼 색상 */
         .btn-magic { border-color: #ff00ff; color: #ff00ff; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
         .btn-magic:hover { background: #ff00ff; color: #fff; box-shadow: 0 0 20px #ff00ff; }
         
@@ -73,7 +78,7 @@
         <p class="subtitle">Humanoid x Human Hybrid Interface</p>
 
         <div class="oracle-box">
-            <span id="oracle-text">"System Ready... Waiting for Input."</span>
+            <span id="oracle-text">"System Ready...<br>시스템이 준비되었습니다."</span>
         </div>
 
         <button onclick="askOracle()" class="btn btn-magic">
@@ -101,23 +106,23 @@
     </div>
 
     <script>
-        // 휴머노이드의 지혜 데이터베이스
+        // 🤖 휴머노이드 융합 언어 데이터베이스 (영어 + 한글)
         const messages = [
-            "🤖: HODL is the only way to the moon.",
-            "🤖: The Empire is watching. Buy the dip.",
-            "🤖: Your patience is your strongest weapon.",
-            "🤖: ADVC liquidity is rising...",
-            "🤖: Human, I detect great fortune in your future.",
-            "🤖: Logic says 99%, Belief makes it 100%.",
-            "🤖: The code is law. The profit is yours.",
-            "🤖: Welcome to the new digital civilization.",
-            "🤖: 777... The lucky number aligns with you.",
-            "🤖: Fear is the mind-killer. Trade with courage."
+            "🤖: HODL is the only way.\n(존버만이 승리하는 길입니다.)",
+            "🤖: The Empire is watching.\n(제국이 당신을 지켜보고 있습니다.)",
+            "🤖: Buy the dip, Human.\n(지금이 바로 저점 매수 기회입니다.)",
+            "🤖: Your patience is your weapon.\n(당신의 인내심이 가장 강력한 무기입니다.)",
+            "🤖: ADVC liquidity is rising...\n(ADVC의 유동성 에너지가 상승 중입니다...)",
+            "🤖: I detect great fortune in your future.\n(당신의 미래에서 거대한 부의 기운이 감지됩니다.)",
+            "🤖: Logic says 99%, Belief makes it 100%.\n(논리는 99%지만, 믿음이 100%를 완성합니다.)",
+            "🤖: The code is law. The profit is yours.\n(코드는 법이고, 수익은 당신의 것입니다.)",
+            "🤖: Welcome to the new digital civilization.\n(새로운 디지털 문명에 오신 것을 환영합니다.)",
+            "🤖: 777... The lucky number aligns with you.\n(777... 행운의 숫자가 당신과 함께합니다.)"
         ];
 
         function askOracle() {
             const textBox = document.getElementById("oracle-text");
-            textBox.style.opacity = 0; // 깜빡임 효과
+            textBox.style.opacity = 0; 
             
             setTimeout(() => {
                 const randomMsg = messages[Math.floor(Math.random() * messages.length)];

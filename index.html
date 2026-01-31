@@ -19,58 +19,61 @@
             min-height: 100vh;
             background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
         }
-        h1 { font-size: 2.2rem; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; letter-spacing: 2px; }
-        p.subtitle { font-size: 0.9rem; color: #888; margin-bottom: 20px; }
+        h1 { font-size: 2.0rem; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; letter-spacing: 2px; }
         
         .container { width: 90%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
 
-        /* 🔮 AI 코어 (심장) 애니메이션 */
+        /* 🔗 지갑 연결 상태창 */
+        .status-box {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        /* 🔮 AI 코어 (심장) */
         .ai-core {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: radial-gradient(circle, #ff00ff 0%, #000000 70%);
-            box-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #00ffcc;
+            box-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff;
             margin-bottom: 20px;
             animation: pulse 2s infinite ease-in-out;
             border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 20px #ff00ff; opacity: 0.8; }
-            50% { transform: scale(1.1); box-shadow: 0 0 50px #ff00ff, 0 0 80px #00ffcc; opacity: 1; }
-            100% { transform: scale(0.95); box-shadow: 0 0 20px #ff00ff; opacity: 0.8; }
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
         }
 
         /* 오라클 박스 */
         .oracle-box {
             width: 100%;
             border: 1px solid #333;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            margin-bottom: 20px;
+            background: rgba(0, 255, 204, 0.05);
+            padding: 15px;
+            margin-bottom: 15px;
             border-radius: 10px;
-            min-height: 80px;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
-            backdrop-filter: blur(5px);
         }
-        #oracle-text { 
-            font-size: 1.0rem; 
-            color: #fff; 
-            font-weight: bold; 
-            line-height: 1.6; 
-            white-space: pre-line;
-        }
+        #oracle-text { font-size: 0.9rem; color: #fff; font-weight: bold; white-space: pre-line; }
 
         /* 버튼 스타일 */
         .btn {
             display: block;
             width: 100%;
-            padding: 15px 0;
-            margin: 10px 0;
+            padding: 12px 0;
+            margin: 8px 0;
             background: transparent;
             border: 1px solid #00ffcc;
             color: #00ffcc;
@@ -81,84 +84,101 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .btn:hover { background: #00ffcc; color: #000; box-shadow: 0 0 15px #00ffcc; transform: translateY(-2px); }
-        
-        .btn-magic { 
-            border-color: #ff00ff; color: #ff00ff; 
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        .btn:hover { background: #00ffcc; color: #000; transform: translateY(-2px); }
+
+        /* 🦊 메타마스크 연결 버튼 (주황색) */
+        .btn-connect {
+            border-color: #f6851b; color: #f6851b;
+            box-shadow: 0 0 10px rgba(246, 133, 27, 0.3);
         }
-        .btn-magic:hover { background: #ff00ff; color: #fff; box-shadow: 0 0 30px #ff00ff; }
+        .btn-connect:hover { background: #f6851b; color: #fff; box-shadow: 0 0 20px #f6851b; }
+
+        .btn-magic { border-color: #ff00ff; color: #ff00ff; }
+        .btn-magic:hover { background: #ff00ff; color: #fff; box-shadow: 0 0 20px #ff00ff; }
         
         .btn-gold { border-color: #ffd700; color: #ffd700; }
-        .btn-gold:hover { background: #ffd700; color: #000; box-shadow: 0 0 20px #ffd700; }
+        .btn-gold:hover { background: #ffd700; color: #000; }
 
-        .footer { margin-top: 40px; font-size: 0.7rem; color: #444; }
+        .footer { margin-top: 30px; font-size: 0.7rem; color: #444; }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div class="status-box" id="wallet-status">🔴 Disconnected (연결 끊김)</div>
+
         <div class="ai-core" id="ai-visual"></div>
 
         <h1>ADVC EMPIRE</h1>
-        <p class="subtitle">Connected to Neural Network...</p>
 
-        <div class="oracle-box">
-            <span id="oracle-text">"System Online.<br>명령을 기다리고 있습니다."</span>
-        </div>
-
-        <button onclick="askOracle()" class="btn btn-magic">
-            🔮 Activate Oracle
+        <button onclick="connectWallet()" class="btn btn-connect" id="connect-btn">
+            🦊 Connect Wallet (지갑 연결)
         </button>
+
+        <div class="oracle-box"><span id="oracle-text">"System Ready..."</span></div>
+        <button onclick="askOracle()" class="btn btn-magic">🔮 Ask Oracle</button>
 
         <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0; width: 100%;">
 
-        <a href="https://quickswap.exchange/#/swap?outputCurrency=0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn btn-gold">
-            🦄 Buy ADVC (QuickSwap)
-        </a>
-
-        <a href="https://t.me/advc_official" target="_blank" class="btn">
-            📢 Telegram Empire
-        </a>
-
-        <a href="https://github.com/dydgkrrhf1234567890-alt/ADVC_Signal_Bot" target="_blank" class="btn">
-            🤖 Trading Bot Code
-        </a>
+        <a href="https://quickswap.exchange/#/swap?outputCurrency=0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn btn-gold">🦄 Buy ADVC</a>
+        <a href="https://t.me/advc_official" target="_blank" class="btn">📢 Telegram</a>
+        <a href="https://github.com/dydgkrrhf1234567890-alt/ADVC_Signal_Bot" target="_blank" class="btn">🤖 Bot Code</a>
     </div>
 
-    <div class="footer">
-        Powered by Polygon Network<br>
-        © 2026 AdventureV Omega
-    </div>
+    <div class="footer">Powered by Polygon Network</div>
 
     <script>
-        // 🤖 V5 하이브리드 데이터베이스
+        // 1. 지갑 연결 함수 (Web3 Core)
+        async function connectWallet() {
+            const statusBox = document.getElementById("wallet-status");
+            const connectBtn = document.getElementById("connect-btn");
+
+            if (window.ethereum) {
+                try {
+                    // 메타마스크에 연결 요청
+                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    const account = accounts[0];
+                    
+                    // 연결 성공 시 화면 변경
+                    statusBox.innerText = "🟢 Connected: " + account.substring(0, 6) + "..." + account.substring(38);
+                    statusBox.style.color = "#00ffcc";
+                    statusBox.style.border = "1px solid #00ffcc";
+                    
+                    connectBtn.innerText = "✅ Wallet Linked (연결됨)";
+                    connectBtn.style.background = "#050505";
+                    connectBtn.style.color = "#555";
+                    connectBtn.disabled = true;
+
+                    alert("🎉 Welcome, Commander! Wallet Connected.");
+                } catch (error) {
+                    alert("❌ Connection Failed: " + error.message);
+                }
+            } else {
+                alert("🦊 MetaMask가 설치되지 않았습니다! (모바일은 메타마스크 앱 브라우저를 사용하세요)");
+            }
+        }
+
+        // 2. 오라클 함수
         const messages = [
             "🤖: HODL is the only way.\n(존버만이 승리하는 길입니다.)",
             "🤖: The Empire is watching.\n(제국이 당신을 지켜보고 있습니다.)",
             "🤖: Buy the dip, Human.\n(지금이 바로 저점 매수 기회입니다.)",
             "🤖: Your patience is your weapon.\n(당신의 인내심이 가장 강력한 무기입니다.)",
             "🤖: ADVC liquidity is rising...\n(ADVC의 유동성 에너지가 상승 중입니다...)",
-            "🤖: I detect great fortune in your future.\n(당신의 미래에서 거대한 부의 기운이 감지됩니다.)",
-            "🤖: Logic says 99%, Belief makes it 100%.\n(논리는 99%지만, 믿음이 100%를 완성합니다.)",
-            "🤖: The code is law. The profit is yours.\n(코드는 법이고, 수익은 당신의 것입니다.)",
-            "🤖: Welcome to the new digital civilization.\n(새로운 디지털 문명에 오신 것을 환영합니다.)",
-            "🤖: 777... The lucky number aligns with you.\n(777... 행운의 숫자가 당신과 함께합니다.)"
+            "🤖: Welcome to the new digital civilization.\n(새로운 디지털 문명에 오신 것을 환영합니다.)"
         ];
 
         function askOracle() {
             const textBox = document.getElementById("oracle-text");
             const core = document.getElementById("ai-visual");
-            
-            // 말할 때 시각적 효과 (깜빡임 가속)
             textBox.style.opacity = 0; 
-            core.style.animationDuration = "0.2s"; // 빠르게 뜀
+            core.style.animationDuration = "0.2s"; 
             
             setTimeout(() => {
                 const randomMsg = messages[Math.floor(Math.random() * messages.length)];
                 textBox.innerText = randomMsg;
                 textBox.style.opacity = 1;
-                core.style.animationDuration = "2s"; // 다시 평온하게
+                core.style.animationDuration = "2s";
             }, 300);
         }
     </script>

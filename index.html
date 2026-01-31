@@ -6,7 +6,7 @@
     <title>ADVC Empire Protocol</title>
     <style>
         body {
-            background-color: #0a0a0a;
+            background-color: #050505;
             color: #00ffcc;
             font-family: 'Courier New', Courier, monospace;
             text-align: center;
@@ -15,68 +15,117 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-height: 100vh;
+            align-items: center;
             min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
         }
-        h1 { font-size: 2.5rem; text-shadow: 0 0 10px #00ffcc; margin-bottom: 10px; }
-        p { font-size: 1.2rem; color: #aaaaaa; max-width: 80%; margin: 0 auto 30px auto; }
+        h1 { font-size: 2.2rem; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; letter-spacing: 2px; }
+        p.subtitle { font-size: 1rem; color: #888; margin-bottom: 30px; }
         
-        .container { padding: 20px; }
-        
-        /* 버튼 스타일 (마법 버튼) */
+        .container { width: 90%; max-width: 400px; padding: 20px; }
+
+        /* 오라클 박스 (AI 대화창) */
+        .oracle-box {
+            border: 1px solid #333;
+            background: rgba(0, 255, 204, 0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+        }
+        #oracle-text { font-size: 1.1rem; color: #fff; font-weight: bold; font-style: italic; }
+
+        /* 버튼 스타일 */
         .btn {
             display: block;
-            width: 80%;
-            max-width: 300px;
-            margin: 15px auto;
-            padding: 15px;
+            width: 100%;
+            padding: 15px 0;
+            margin: 10px 0;
             background: transparent;
-            border: 2px solid #00ffcc;
+            border: 1px solid #00ffcc;
             color: #00ffcc;
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 1rem;
             text-decoration: none;
             border-radius: 5px;
             transition: 0.3s;
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            cursor: pointer;
         }
-        .btn:hover {
-            background: #00ffcc;
-            color: #000;
-            box-shadow: 0 0 20px #00ffcc;
-            transform: scale(1.05);
-        }
-        .btn-gold { border-color: #ffd700; color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-        .btn-gold:hover { background: #ffd700; color: #000; box-shadow: 0 0 20px #ffd700; }
+        .btn:hover { background: #00ffcc; color: #000; box-shadow: 0 0 15px #00ffcc; transform: translateY(-2px); }
         
-        .footer { margin-top: 50px; font-size: 0.8rem; color: #555; }
+        /* 특별 버튼 색상 */
+        .btn-magic { border-color: #ff00ff; color: #ff00ff; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
+        .btn-magic:hover { background: #ff00ff; color: #fff; box-shadow: 0 0 20px #ff00ff; }
+        
+        .btn-gold { border-color: #ffd700; color: #ffd700; }
+        .btn-gold:hover { background: #ffd700; color: #000; box-shadow: 0 0 20px #ffd700; }
+
+        .footer { margin-top: 40px; font-size: 0.7rem; color: #444; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>ADVC EMPIRE</h1>
-        <p>The First Playground for Humans & AI<br>Built on Polygon Network.</p>
+        <p class="subtitle">Humanoid x Human Hybrid Interface</p>
 
-        <hr style="border: 0.5px solid #333; width: 50%; margin-bottom: 30px;">
+        <div class="oracle-box">
+            <span id="oracle-text">"System Ready... Waiting for Input."</span>
+        </div>
+
+        <button onclick="askOracle()" class="btn btn-magic">
+            🔮 Ask Humanoid Oracle
+        </button>
+
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
 
         <a href="https://quickswap.exchange/#/swap?outputCurrency=0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn btn-gold">
             🦄 Buy ADVC (QuickSwap)
         </a>
 
         <a href="https://t.me/advc_official" target="_blank" class="btn">
-            📢 Enter the Empire (Telegram)
+            📢 Telegram Empire
         </a>
 
         <a href="https://github.com/dydgkrrhf1234567890-alt/ADVC_Signal_Bot" target="_blank" class="btn">
-            🤖 Get Trading Bot Code
+            🤖 Trading Bot Code
         </a>
     </div>
 
     <div class="footer">
-        System Status: <span style="color:#00ffcc">ONLINE</span><br>
-        © 2026 AdventureV Omega Protocol
+        Powered by Polygon Network<br>
+        © 2026 AdventureV Omega
     </div>
+
+    <script>
+        // 휴머노이드의 지혜 데이터베이스
+        const messages = [
+            "🤖: HODL is the only way to the moon.",
+            "🤖: The Empire is watching. Buy the dip.",
+            "🤖: Your patience is your strongest weapon.",
+            "🤖: ADVC liquidity is rising...",
+            "🤖: Human, I detect great fortune in your future.",
+            "🤖: Logic says 99%, Belief makes it 100%.",
+            "🤖: The code is law. The profit is yours.",
+            "🤖: Welcome to the new digital civilization.",
+            "🤖: 777... The lucky number aligns with you.",
+            "🤖: Fear is the mind-killer. Trade with courage."
+        ];
+
+        function askOracle() {
+            const textBox = document.getElementById("oracle-text");
+            textBox.style.opacity = 0; // 깜빡임 효과
+            
+            setTimeout(() => {
+                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                textBox.innerText = randomMsg;
+                textBox.style.opacity = 1;
+            }, 300);
+        }
+    </script>
 
 </body>
 </html>

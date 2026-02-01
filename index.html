@@ -3,147 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADVC Empire (Polygon)</title>
+    <title>ADVC Empire: Perfectio Edition</title>
     <style>
         body {
             background-color: #050505; color: #00ffcc;
             font-family: 'Courier New', Courier, monospace;
             text-align: center; margin: 0; padding: 0;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
             background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
-            user-select: none;
+            overflow-x: hidden;
         }
-        h1 { font-size: 2.0rem; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; }
-        .container { width: 90%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; align-items: center; margin-top: 80px; }
-        .score-board { font-size: 1.6rem; color: #ffd700; text-shadow: 0 0 10px #ffd700; margin: 20px 0 5px 0; font-weight: bold; word-break: break-all; }
-        .score-sub { font-size: 0.8rem; color: #666; margin-bottom: 30px; }
+        .header {
+            width: 100%; background: linear-gradient(90deg, #000, #1a001a, #000);
+            color: #FFD700; padding: 20px 0; border-bottom: 2px solid #FFD700;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+        }
+        .container { width: 90%; max-width: 500px; padding: 40px 20px; margin-top: 20px; }
+        .score-board { font-size: 2.2rem; color: #ffd700; text-shadow: 0 0 15px #ffd700; margin: 25px 0; font-weight: bold; }
         
-        /* 코어 디자인 */
+        /* 코어 디자인 (연금술의 핵) */
         .ai-core {
-            width: 150px; height: 150px;
-            background: radial-gradient(circle at 30% 30%, #ff00cc, #660066);
-            border-radius: 50%; box-shadow: 0 0 30px #ff00cc;
-            cursor: pointer; transition: transform 0.1s; margin-bottom: 30px; border: 2px solid #ff66ff;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle at 30% 30%, #ff00cc, #330033);
+            border-radius: 50%; box-shadow: 0 0 40px #ff00cc;
+            cursor: pointer; transition: 0.3s; margin: 30px auto; border: 3px solid #ff66ff;
+            animation: pulse 2s infinite;
         }
-        .ai-core:active { transform: scale(0.95); }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 20px #ff00cc; } 50% { transform: scale(1.05); box-shadow: 0 0 50px #ff00cc; } 100% { transform: scale(1); box-shadow: 0 0 20px #ff00cc; } }
 
-        /* 버튼 스타일 */
-        #connect-btn, #claim-btn, .shop-btn {
+        /* 버튼 마법 */
+        .btn {
             background: transparent; border: 1px solid #ff6600; color: #ff6600;
-            padding: 10px 20px; cursor: pointer; font-family: inherit; margin-bottom: 20px; border-radius: 5px; font-weight: bold;
-            text-decoration: none; display: inline-block;
+            padding: 12px 25px; cursor: pointer; font-family: inherit; margin: 10px;
+            border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block;
+            transition: 0.3s;
         }
-        #claim-btn { border-color: #333; color: #555; pointer-events: none; }
-        
-        /* 상점 버튼 (유니콘) */
-        .shop-btn {
-            border-color: #ff00cc; color: #ff00cc; margin-top: 10px;
-        }
-        .shop-btn:hover {
-            background-color: #ff00cc; color: #000; box-shadow: 0 0 15px #ff00cc;
+        .btn:hover { background: #ff6600; color: #000; box-shadow: 0 0 20px #ff6600; }
+        .btn-pink { border-color: #ff00cc; color: #ff00cc; }
+        .btn-pink:hover { background: #ff00cc; color: #000; box-shadow: 0 0 20px #ff00cc; }
+
+        /* 마도서 섹션 */
+        .philosophy-card {
+            background: rgba(255, 255, 255, 0.05); border: 1px dashed #FFD700;
+            padding: 20px; margin-top: 40px; border-radius: 10px; text-align: left;
+            font-size: 0.85rem; line-height: 1.6; color: #ccc;
         }
     </style>
 </head>
 <body>
-    <div style="width: 100%; background-color: #000; color: #FFD700; text-align: center; padding: 15px 0; border-bottom: 2px solid #FFD700; font-family: monospace; position: absolute; top: 0;">
-        <h2 style="margin: 0; text-shadow: 0 0 10px #FFD700;">✨ ADVC REAL-NET ✨</h2>
-        <p style="margin: 5px 0 0 0; font-size: 0.9em;">System: Polygon Network (POL)</p>
+    <div class="header">
+        <h2 style="margin: 0;">🔱 ADVC EMPIRE: PERFECTIO 🔱</h2>
+        <p style="margin: 5px 0 0 0; font-size: 0.8em; letter-spacing: 2px;">The Digital Alchemy of Prince Solomon</p>
     </div>
 
     <div class="container">
-        <button id="connect-btn" onclick="window.connectWallet()">🦊 Connect Wallet</button>
+        <button id="connect-btn" class="btn" onclick="window.connectWallet()">🦊 Connect Alchemy Wallet</button>
         
-        <h1>MY ADVC</h1>
+        <p style="color: #666; margin-bottom: 0;">- CURRENT ASSET -</p>
         <div class="score-board" id="balance-display">--- ADVC</div>
-        <div class="score-sub" id="status-msg">지갑 연결 및 네트워크 확인 중...</div>
+        <div id="status-msg" style="font-size: 0.7rem; color: #444;">Blockchain Verification Required...</div>
         
-        <button id="claim-btn" onclick="window.sendTestTransaction()">💸 Test Send (0.1)</button>
-        
-        <div class="ai-core"></div>
+        <div class="ai-core" onclick="showWisdom()"></div>
 
-        <a href="https://dapp.quickswap.exchange/swap/best/ETH/0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="shop-btn">🦄 Buy ADVC (거래소 이동)</a>
+        <div style="display: flex; flex-direction: column;">
+            <a href="https://dapp.quickswap.exchange/swap/best/ETH/0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn btn-pink">🦄 Buy ADVC (QuickSwap)</a>
+            <a href="https://polygonscan.com/token/0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn" style="border-color: #00ffcc; color: #00ffcc;">🔍 View Genesis Ledger (PolygonScan)</a>
+        </div>
+
+        <div class="philosophy-card" id="wisdom-box">
+            <h3 style="color: #FFD700; margin-top: 0;">📜 연금술사의 지침 (Communitas)</h3>
+            "ADVC는 단순한 코인이 아닌, 디지털 시대의 새로운 가치를 창조하는 연금술사의 도구입니다. 투명한 장부 위에 왕자님의 비전을 쌓아 영원한 유산을 남기소서."
+        </div>
     </div>
 
     <script type="module">
         import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.esm.min.js";
 
         const tokenAddress = "0x5b41e1f16507834B42E503e79761dd2CC218Cb5A"; 
-        const tokenDecimals = 18;
-        const tokenABI = [
-            "function balanceOf(address owner) view returns (uint256)",
-            "function transfer(address to, uint256 amount) returns (bool)"
-        ];
-
+        const tokenABI = ["function balanceOf(address owner) view returns (uint256)"];
         let provider, signer, tokenContract, userAddress;
 
-        // [핵심] 폴리곤 강제 전환 함수
-        async function switchToPolygon() {
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x89' }], // Polygon Mainnet ID
-                });
-            } catch (error) {
-                if (error.code === 4902) {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: '0x89',
-                            chainName: 'Polygon Mainnet',
-                            rpcUrls: ['https://polygon-rpc.com/']
-                        }],
-                    });
-                }
-            }
-        }
+        window.showWisdom = function() {
+            alert("✨ Innovatio Continua: 끊임없이 진화하는 제국의 힘이여, ADVC와 함께 도약하라!");
+        };
 
         window.connectWallet = async function() {
-            if (!window.ethereum) { alert("메타마스크 앱 브라우저를 사용해주세요!"); return; }
-
+            if (!window.ethereum) { alert("메타마스크 앱 브라우저를 사용하십시오!"); return; }
             try {
-                // 1. 네트워크 맞추기
-                await switchToPolygon();
-
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
 
-                document.getElementById("connect-btn").innerText = "Connected!";
+                document.getElementById("connect-btn").innerText = "Alchemy Connected";
                 document.getElementById("connect-btn").style.borderColor = "#00FF00";
-                document.getElementById("connect-btn").style.color = "#00FF00";
                 
-                document.getElementById("balance-display").innerText = "Loading...";
-
                 tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
-                
-                // 2. 잔액 조회
                 const balance = await tokenContract.balanceOf(userAddress);
-                const formattedBalance = ethers.utils.formatUnits(balance, tokenDecimals);
-                const displayNum = Number(formattedBalance).toLocaleString(undefined, {maximumFractionDigits: 2});
+                const formatted = ethers.utils.formatUnits(balance, 18);
                 
-                document.getElementById("balance-display").innerText = displayNum + " ADVC";
-                document.getElementById("status-msg").innerText = "✅ Polygon Network Connected";
-                
-                const cBtn = document.getElementById("claim-btn");
-                cBtn.style.borderColor = "#ffd700"; cBtn.style.color = "#ffd700"; cBtn.style.pointerEvents = "auto";
-
+                document.getElementById("balance-display").innerText = Number(formatted).toLocaleString() + " ADVC";
+                document.getElementById("status-msg").innerText = "✅ Transparentia: Blockchain Verified";
             } catch (err) {
-                alert("오류 발생: " + err.message);
-                document.getElementById("balance-display").innerText = "Error";
-            }
-        };
-
-        window.sendTestTransaction = async function() {
-            try {
-                const amount = "0.1"; // 0.1개 고정 전송 테스트
-                const parseAmount = ethers.utils.parseUnits(amount, tokenDecimals);
-                alert("가스비 승인 창이 뜨면 '확인'을 눌러주세요.");
-                const tx = await tokenContract.transfer(userAddress, parseAmount);
-                alert("전송 시작! Hash: " + tx.hash);
-            } catch (err) {
-                alert("전송 취소 또는 실패");
+                alert("연금술 연결 실패: " + err.message);
             }
         };
     </script>

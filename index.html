@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADVC Empire Protocol (Final)</title>
-    
-    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js" type="application/javascript"></script>
-    
+    <title>ADVC Empire (Real-Net)</title>
     <style>
         body {
             background-color: #050505; color: #00ffcc;
@@ -42,54 +39,86 @@
     </div>
 
     <div class="container">
-        <button id="connect-btn" onclick="connectWallet()">🦊 Connect Wallet</button>
+        <button id="connect-btn" onclick="window.connectWallet()">🦊 Connect Wallet</button>
         <h1>MY ADVC</h1>
         <div class="score-board" id="balance-display">--- ADVC</div>
         <div class="score-sub" id="status-msg">지갑 연결 대기 중...</div>
-        <button id="claim-btn" onclick="sendTestTransaction()">💸 Test Send</button>
+        <button id="claim-btn" onclick="window.sendTestTransaction()">💸 Test Send</button>
         <div class="ai-core"></div>
     </div>
 
-    <script>
+    <script type="module">
+        import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.esm.min.js";
+
+        // 왕자님의 ADVC 토큰 주소 (수정 금지)
         const tokenAddress = "0x5b41e1f16507834B42E503e79761dd2CC218Cb5A"; 
-        const tokenABI = ["function balanceOf(address owner) view returns (uint256)", "function decimals() view returns (uint8)", "function transfer(address to, uint256 amount) returns (bool)"];
+        const tokenABI = [
+            "function balanceOf(address owner) view returns (uint256)",
+            "function decimals() view returns (uint8)",
+            "function transfer(address to, uint256 amount) returns (bool)"
+        ];
+
         let provider, signer, tokenContract, userAddress;
 
-        async function connectWallet() {
-            if (typeof ethers === 'undefined') { alert("⏳ 로딩 중입니다. 5초 뒤에 다시 눌러주세요!"); return; }
-            if (!window.ethereum) { alert("⚠ 메타마스크 앱 브라우저에서 실행해야 합니다!"); return; }
+        // 버튼이 인식할 수 있도록 window에 함수를 등록
+        window.connectWallet = async function() {
+            if (!window.ethereum) { 
+                alert("⚠ 메타마스크 앱 브라우저에서 실행해주세요!"); 
+                return; 
+            }
 
             try {
+                // Ethers가 잘 로딩됐는지 확인
+                if (!ethers) throw new Error("도구 로딩 실패. 새로고침 해주세요.");
+
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
 
-                document.getElementById("connect-btn").innerText = "Connected!";
-                document.getElementById("connect-btn").style.borderColor = "#00FF00";
-                
+                // 버튼 꾸미기
+                const btn = document.getElementById("connect-btn");
+                btn.innerText = "Connected!";
+                btn.style.borderColor = "#00FF00";
+                btn.style.color = "#00FF00";
+
+                // 계약 연결 및 잔액 조회
                 tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
                 const balance = await tokenContract.balanceOf(userAddress);
                 const decimals = await tokenContract.decimals();
                 const formattedBalance = ethers.utils.formatUnits(balance, decimals);
                 
+                // 잔액 표시
                 document.getElementById("balance-display").innerText = Number(formattedBalance).toLocaleString(undefined, {maximumFractionDigits: 2}) + " ADVC";
-                document.getElementById("status-msg").innerText = "✅ 지갑 연결 완료";
+                document.getElementById("status-msg").innerText = "✅ 지갑 연결 완료 (Real Asset)";
                 
+                // 전송 버튼 활성화
                 const cBtn = document.getElementById("claim-btn");
-                cBtn.style.borderColor = "#ffd700"; cBtn.style.color = "#ffd700"; cBtn.style.pointerEvents = "auto";
-            } catch (err) { alert("연결 오류: " + err.message); }
-        }
+                cBtn.style.borderColor = "#ffd700"; 
+                cBtn.style.color = "#ffd700"; 
+                cBtn.style.pointerEvents = "auto";
 
-        async function sendTestTransaction() {
+            } catch (err) {
+                alert("오류 발생: " + err.message);
+            }
+        };
+
+        window.sendTestTransaction = async function() {
             try {
                 const amount = prompt("전송할 수량 (ADVC):", "0.1");
                 if(!amount) return;
+                
                 const decimals = await tokenContract.decimals();
-                const tx = await tokenContract.transfer(userAddress, ethers.utils.parseUnits(amount, decimals));
+                const parseAmount = ethers.utils.parseUnits(amount, decimals);
+                
+                alert(">>> 가스비 승인 창이 뜨면 '확인'을 눌러주세요.");
+                const tx = await tokenContract.transfer(userAddress, parseAmount);
+                
                 alert("전송 시작! Hash: " + tx.hash);
-            } catch (err) { alert("전송 실패: " + err.message); }
-        }
+            } catch (err) {
+                alert("전송 실패: " + err.message);
+            }
+        };
     </script>
 </body>
 </html>

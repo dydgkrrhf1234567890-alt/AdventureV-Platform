@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADVC Empire Protocol</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
     <style>
         body {
             background-color: #050505;
@@ -84,6 +85,7 @@
             font-family: inherit;
             margin-bottom: 20px;
             border-radius: 5px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -94,7 +96,7 @@
     </div>
 
     <div class="container">
-        <button id="connect-btn" onclick="alert('지갑 연결 시스템 준비 중...')">🦊 Connect Wallet (지갑 연결)</button>
+        <button id="connect-btn" onclick="connectWallet()">🦊 Connect Wallet (지갑 연결)</button>
 
         <h1>ADVC MINER</h1>
         
@@ -113,52 +115,78 @@
 
     <script>
         let score = 0.0000;
-        const miningRate = 0.0015; // 봇이 캐는 기본 속도
+        const miningRate = 0.0015;
+        let userAccount = null;
 
-        // 1. [자동 채굴] 봇이 보내주는 신호 수신 (자동 증가)
+        // 1. [핵심] 지갑 연결 함수 (MetaMask)
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    // 메타마스크에게 계정 요청
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0];
+                    
+                    // 버튼을 지갑 주소로 변경 (간지나게)
+                    const btn = document.getElementById("connect-btn");
+                    btn.innerText = "🦊 Connected: " + userAccount.substring(0,6) + "..." + userAccount.substring(38);
+                    btn.style.borderColor = "#00FF00";
+                    btn.style.color = "#00FF00";
+                    btn.style.boxShadow = "0 0 10px #00FF00";
+                    
+                    alert(">>> [ACCESS GRANTED] 왕자님, 지갑이 연결되었습니다! 자산 전송 준비 완료.");
+                    console.log("Connected Account:", userAccount);
+
+                } catch (error) {
+                    console.error(error);
+                    alert("연결이 거부되었습니다.");
+                }
+            } else {
+                alert("메타마스크(MetaMask)가 설치되어 있지 않습니다! 앱을 설치해주세요.");
+            }
+        }
+
+        // 2. [자동 채굴] 봇 동기화
         function startBotSync() {
             console.log(">>> [Genesis Sync] Bot Connection Established.");
             setInterval(() => {
                 score += miningRate;
                 updateDisplay();
-            }, 50); // 0.05초마다 갱신 (엄청 빠른 속도감!)
+            }, 50);
         }
 
-        // 2. [수동 채굴] 왕자님이 직접 클릭할 때 (부스터)
+        // 3. [수동 채굴] 클릭 액션
         function mineToken() {
-            score += 0.5; // 클릭 한 번에 0.5개씩 팍팍!
-            
-            // 클릭 효과 (로그 및 진동효과)
-            console.log(">>> [Manual Mining] Energy Injected!");
+            score += 0.5;
             updateDisplay();
             
-            // 클릭 시 버튼 흔들림 애니메이션
             const core = document.querySelector('.ai-core');
             core.style.transform = "scale(0.95)";
             setTimeout(() => core.style.transform = "scale(1)", 100);
         }
 
-        // 3. [화면 갱신] 숫자를 예쁘게 보여줌
+        // 4. [화면 갱신]
         function updateDisplay() {
-            // 소수점 4자리까지 표시
             document.getElementById("score-display").innerText = score.toFixed(4) + " ADVC";
 
-            // 목표 달성 시 (10개 돌파) 황금빛으로 변신
             if(score >= 10) {
                 const display = document.getElementById("score-display");
-                display.style.color = "#00FF00"; // 네온 그린
+                display.style.color = "#00FF00";
                 display.style.textShadow = "0 0 20px #00FF00";
                 document.getElementById("score-sub").innerText = "🎉 TARGET REACHED! (인출 가능)";
                 
-                // 버튼 활성화
                 const btn = document.getElementById("claim-btn");
                 btn.style.borderColor = "#00FF00";
                 btn.style.color = "#00FF00";
-                btn.onclick = function() { alert(">>> [SYSTEM] 인출 요청이 전송되었습니다. (Testnet)"); };
+                btn.onclick = function() { 
+                    if(userAccount) {
+                        alert(">>> [SYSTEM] " + userAccount + " 주소로 전송을 시작합니다... (가스비 필요)");
+                    } else {
+                        alert("지갑을 먼저 연결해주세요!");
+                    }
+                };
             }
         }
 
-        // 사이트 켜지자마자 봇 연결 시작
         window.onload = startBotSync;
     </script>
 </body>

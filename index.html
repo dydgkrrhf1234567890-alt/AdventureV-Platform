@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADVC Empire (Real-Net)</title>
+    <title>ADVC Empire (Polygon Only)</title>
     <style>
         body {
             background-color: #050505; color: #00ffcc;
@@ -50,56 +50,82 @@
     <script type="module">
         import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.esm.min.js";
 
-        // 왕자님의 ADVC 토큰 주소 (수정 금지)
         const tokenAddress = "0x5b41e1f16507834B42E503e79761dd2CC218Cb5A"; 
+        // 18자리 고정 (속도 향상)
+        const tokenDecimals = 18;
         const tokenABI = [
             "function balanceOf(address owner) view returns (uint256)",
-            "function decimals() view returns (uint8)",
             "function transfer(address to, uint256 amount) returns (bool)"
         ];
 
         let provider, signer, tokenContract, userAddress;
 
-        // 버튼이 인식할 수 있도록 window에 함수를 등록
-        window.connectWallet = async function() {
-            if (!window.ethereum) { 
-                alert("⚠ 메타마스크 앱 브라우저에서 실행해주세요!"); 
-                return; 
+        // [핵심] 폴리곤 네트워크 강제 전환 함수
+        async function switchToPolygon() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x89' }], // 0x89 = Polygon Mainnet
+                });
+            } catch (error) {
+                // 폴리곤이 없으면 추가하라고 띄움
+                if (error.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x89',
+                                chainName: 'Polygon Mainnet',
+                                rpcUrls: ['https://polygon-rpc.com/']
+                            }],
+                        });
+                    } catch (addError) {
+                        alert("폴리곤 네트워크 추가 실패. 메타마스크에서 직접 변경해주세요.");
+                    }
+                }
             }
+        }
+
+        window.connectWallet = async function() {
+            if (!window.ethereum) { alert("메타마스크 앱 브라우저를 사용해주세요!"); return; }
 
             try {
-                // Ethers가 잘 로딩됐는지 확인
-                if (!ethers) throw new Error("도구 로딩 실패. 새로고침 해주세요.");
+                // 1. 먼저 폴리곤으로 채널 고정!
+                await switchToPolygon();
 
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
 
-                // 버튼 꾸미기
-                const btn = document.getElementById("connect-btn");
-                btn.innerText = "Connected!";
-                btn.style.borderColor = "#00FF00";
-                btn.style.color = "#00FF00";
+                document.getElementById("connect-btn").innerText = "Connected!";
+                document.getElementById("connect-btn").style.borderColor = "#00FF00";
+                document.getElementById("connect-btn").style.color = "#00FF00";
+                
+                // 로딩 표시
+                document.getElementById("balance-display").innerText = "Loading...";
 
-                // 계약 연결 및 잔액 조회
                 tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
-                const balance = await tokenContract.balanceOf(userAddress);
-                const decimals = await tokenContract.decimals();
-                const formattedBalance = ethers.utils.formatUnits(balance, decimals);
                 
-                // 잔액 표시
-                document.getElementById("balance-display").innerText = Number(formattedBalance).toLocaleString(undefined, {maximumFractionDigits: 2}) + " ADVC";
-                document.getElementById("status-msg").innerText = "✅ 지갑 연결 완료 (Real Asset)";
-                
-                // 전송 버튼 활성화
-                const cBtn = document.getElementById("claim-btn");
-                cBtn.style.borderColor = "#ffd700"; 
-                cBtn.style.color = "#ffd700"; 
-                cBtn.style.pointerEvents = "auto";
+                // 잔액 조회 (디버깅용: 실패 시 에러 띄움)
+                try {
+                    const balance = await tokenContract.balanceOf(userAddress);
+                    const formattedBalance = ethers.utils.formatUnits(balance, tokenDecimals);
+                    
+                    // 콤마 찍기
+                    const displayNum = Number(formattedBalance).toLocaleString(undefined, {maximumFractionDigits: 2});
+                    document.getElementById("balance-display").innerText = displayNum + " ADVC";
+                    document.getElementById("status-msg").innerText = "✅ 지갑 연결 완료 (Polygon)";
+                    
+                    const cBtn = document.getElementById("claim-btn");
+                    cBtn.style.borderColor = "#ffd700"; cBtn.style.color = "#ffd700"; cBtn.style.pointerEvents = "auto";
+                } catch(readErr) {
+                    alert("잔액 조회 실패! 네트워크 상태를 확인하세요.\n" + readErr.message);
+                    document.getElementById("balance-display").innerText = "Error";
+                }
 
             } catch (err) {
-                alert("오류 발생: " + err.message);
+                alert("연결 오류: " + err.message);
             }
         };
 
@@ -108,12 +134,9 @@
                 const amount = prompt("전송할 수량 (ADVC):", "0.1");
                 if(!amount) return;
                 
-                const decimals = await tokenContract.decimals();
-                const parseAmount = ethers.utils.parseUnits(amount, decimals);
-                
-                alert(">>> 가스비 승인 창이 뜨면 '확인'을 눌러주세요.");
+                const parseAmount = ethers.utils.parseUnits(amount, tokenDecimals);
+                alert("가스비 승인 창이 뜨면 '확인'을 눌러주세요.");
                 const tx = await tokenContract.transfer(userAddress, parseAmount);
-                
                 alert("전송 시작! Hash: " + tx.hash);
             } catch (err) {
                 alert("전송 실패: " + err.message);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADVC Empire Protocol</title>
+    <title>ADVC Empire Protocol (Real-Net)</title>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
     <style>
         body {
@@ -11,191 +11,151 @@
             color: #00ffcc;
             font-family: 'Courier New', Courier, monospace;
             text-align: center;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
             min-height: 100vh;
             background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
             user-select: none;
         }
-
-        /* 폰트 및 텍스트 스타일 */
         h1 { font-size: 2.0rem; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; }
-        
         .container { width: 90%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; align-items: center; margin-top: 80px; }
         
         /* 점수판 스타일 */
         .score-board {
-            font-size: 2.5rem;
-            color: #ffd700;
-            text-shadow: 0 0 10px #ffd700;
-            margin: 20px 0 5px 0;
-            font-weight: bold;
+            font-size: 2.0rem; color: #ffd700; text-shadow: 0 0 10px #ffd700;
+            margin: 20px 0 5px 0; font-weight: bold; word-break: break-all;
         }
         .score-sub { font-size: 0.8rem; color: #666; margin-bottom: 30px; }
         
-        /* AI 코어 (보라색 구슬) */
+        /* AI 코어 */
         .ai-core {
-            width: 150px;
-            height: 150px;
+            width: 150px; height: 150px;
             background: radial-gradient(circle at 30% 30%, #ff00cc, #660066);
-            border-radius: 50%;
-            box-shadow: 0 0 30px #ff00cc;
-            cursor: pointer;
-            transition: transform 0.1s;
-            margin-bottom: 30px;
+            border-radius: 50%; box-shadow: 0 0 30px #ff00cc;
+            cursor: pointer; transition: transform 0.1s; margin-bottom: 30px;
             border: 2px solid #ff66ff;
         }
         .ai-core:active { transform: scale(0.95); }
         
-        /* 버튼 스타일 */
-        .btn {
-            background: transparent;
-            border: 1px solid #333;
-            color: #888;
-            padding: 10px 20px;
-            text-decoration: none;
-            font-size: 0.8rem;
-            margin: 5px;
-            border-radius: 5px;
-            transition: 0.3s;
+        /* 버튼 */
+        #connect-btn, #claim-btn {
+            background: transparent; border: 1px solid #ff6600; color: #ff6600;
+            padding: 10px 20px; cursor: pointer; font-family: inherit; margin-bottom: 20px; border-radius: 5px; font-weight: bold;
         }
-        .btn:hover { border-color: #00ffcc; color: #00ffcc; }
-
-        #claim-btn {
-            background: #111;
-            color: #ffd700;
-            border: 1px solid #ffd700;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            font-family: inherit;
-            border-radius: 5px;
-        }
-
-        #connect-btn {
-            border: 1px solid #ff6600;
-            color: #ff6600;
-            background: transparent;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-family: inherit;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
+        #claim-btn { border-color: #333; color: #555; pointer-events: none; } /* 처음엔 비활성 */
     </style>
 </head>
 <body>
     <div style="width: 100%; background-color: #000; color: #FFD700; text-align: center; padding: 15px 0; border-bottom: 2px solid #FFD700; font-family: monospace; position: absolute; top: 0;">
-        <h2 style="margin: 0; text-shadow: 0 0 10px #FFD700;">✨ GENESIS SYSTEM: ONLINE ✨</h2>
-        <p style="margin: 5px 0 0 0; font-size: 0.9em;">System Authority: Prince Solomon | Status: Hyper-Fusion Active</p>
+        <h2 style="margin: 0; text-shadow: 0 0 10px #FFD700;">✨ GENESIS REAL-NET: ONLINE ✨</h2>
+        <p style="margin: 5px 0 0 0; font-size: 0.9em;">System Authority: Prince Solomon | Network: Polygon (POL)</p>
     </div>
 
     <div class="container">
-        <button id="connect-btn" onclick="connectWallet()">🦊 Connect Wallet (지갑 연결)</button>
+        <button id="connect-btn" onclick="connectWallet()">🦊 Connect Real Wallet</button>
 
-        <h1>ADVC MINER</h1>
+        <h1>MY ADVC WALLET</h1>
         
-        <div class="score-board" id="score-display">0.0000 ADVC</div>
-        <div class="score-sub" id="score-sub">Target: 10 ADVC to Claim (10개 모으면 인출 가능)</div>
+        <div class="score-board" id="balance-display">--- ADVC</div>
+        <div class="score-sub" id="status-msg">지갑을 연결하여 실제 자산을 확인하세요.</div>
 
-        <button id="claim-btn" onclick="alert('아직 목표량을 채우지 못했습니다!')">💰 Claim Reward (코인으로 받기)</button>
+        <button id="claim-btn" onclick="sendTestTransaction()">💸 Test Transaction (전송 테스트)</button>
 
-        <div class="ai-core" onclick="mineToken()"></div>
-
-        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0; width: 100%;">
-
-        <a href="https://quickswap.exchange/#/swap?outputCurrency=0x5b41e1f16507834B42E503e79761dd2CC218Cb5A" target="_blank" class="btn">🦄 Buy ADVC</a>
-        <a href="https://t.me/advc_official" target="_blank" class="btn">📢 Telegram</a>
+        <div class="ai-core" onclick="alert('채굴 기능은 리얼 모드에서 자동화됩니다!')"></div>
     </div>
 
     <script>
-        let score = 0.0000;
-        const miningRate = 0.0015;
-        let userAccount = null;
+        // 1. 왕자님의 진짜 토큰 주소 (수정 금지)
+        const tokenAddress = "0x5b41e1f16507834B42E503e79761dd2CC218Cb5A"; 
+        
+        // 최소한의 기능(잔액 조회, 전송)을 위한 ABI
+        const tokenABI = [
+            "function balanceOf(address owner) view returns (uint256)",
+            "function decimals() view returns (uint8)",
+            "function transfer(address to, uint256 amount) returns (bool)"
+        ];
 
-        // 1. [지갑 연결] 메타마스크 연동
+        let provider, signer, tokenContract, userAddress;
+
+        // 2. [지갑 연결] & [잔액 조회]
         async function connectWallet() {
             if (window.ethereum) {
                 try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAccount = accounts[0];
-                    
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+
+                    // 버튼 꾸미기
                     const btn = document.getElementById("connect-btn");
-                    btn.innerText = "🦊 Connected: " + userAccount.substring(0,6) + "..." + userAccount.substring(38);
-                    btn.style.borderColor = "#00FF00";
-                    btn.style.color = "#00FF00";
-                    btn.style.boxShadow = "0 0 15px #00FF00";
+                    btn.innerText = "🦊 Connected: " + userAddress.substring(0,6) + "...";
+                    btn.style.borderColor = "#00FF00"; btn.style.color = "#00FF00";
+
+                    // 계약 연결
+                    tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
                     
-                    alert(">>> [SYSTEM] 지갑 연결 성공! 왕자님을 환영합니다.");
+                    // 진짜 잔액 가져오기
+                    updateRealBalance();
+
+                    // 전송 버튼 활성화
+                    const claimBtn = document.getElementById("claim-btn");
+                    claimBtn.style.borderColor = "#ffd700"; claimBtn.style.color = "#ffd700";
+                    claimBtn.style.pointerEvents = "auto";
+
                 } catch (error) {
-                    alert("연결이 취소되었습니다.");
+                    alert("연결 실패: " + error.message);
                 }
             } else {
-                alert("메타마스크(MetaMask) 앱이 필요합니다!");
+                alert("메타마스크가 필요합니다!");
             }
         }
 
-        // 2. [자동 채굴] 봇 동기화
-        function startBotSync() {
-            setInterval(() => {
-                score += miningRate;
-                updateDisplay();
-            }, 50);
-        }
-
-        // 3. [수동 채굴] 클릭 액션
-        function mineToken() {
-            score += 0.5;
-            updateDisplay();
-            const core = document.querySelector('.ai-core');
-            core.style.transform = "scale(0.95)";
-            setTimeout(() => core.style.transform = "scale(1)", 100);
-        }
-
-        // 4. [인출 시스템] - 전송 시뮬레이션
-        async function requestClaim() {
-            if(!userAccount) {
-                alert("⛔ 먼저 지갑을 연결해야 합니다!");
-                return;
+        // 3. [진짜 잔액 불러오기]
+        async function updateRealBalance() {
+            try {
+                const balance = await tokenContract.balanceOf(userAddress);
+                const decimals = await tokenContract.decimals();
+                const formattedBalance = ethers.utils.formatUnits(balance, decimals);
+                
+                // 화면에 표시 (소수점 2자리까지만 예쁘게)
+                // 숫자가 너무 크면 콤마(,) 찍기
+                const displayNum = parseFloat(formattedBalance).toLocaleString(undefined, {maximumFractionDigits: 2});
+                
+                document.getElementById("balance-display").innerText = displayNum + " ADVC";
+                document.getElementById("status-msg").innerText = "Blockchain Verification Complete (Real Asset)";
+            } catch (err) {
+                console.error(err);
+                document.getElementById("balance-display").innerText = "Error";
             }
+        }
+
+        // 4. [전송 테스트] - 나 자신에게 0.001 ADVC 보내기 (가스비 확인용)
+        async function sendTestTransaction() {
+            if(!tokenContract) return;
             
-            if(confirm(`[출금 요청]\n\n수령인: ${userAccount}\n수량: ${score.toFixed(4)} ADVC\n\n승인하시겠습니까?`)) {
-                alert(">>> [Processing] 블록체인 승인 대기 중...");
+            const amount = prompt("테스트로 전송할 ADVC 수량을 입력하세요:", "0.1");
+            if(!amount) return;
+
+            try {
+                alert(">>> [메타마스크 확인 필요]\n가스비(POL) 승인 창이 뜨면 '확인'을 눌러주세요.");
                 
-                // 2초 뒤 전송 완료 연출
-                setTimeout(() => {
-                    alert(`✅ [SUCCESS] 전송 완료!\n\n${score.toFixed(4)} ADVC가 지갑으로 전송되었습니다.\n(Transaction Hash: 0x7f...3a2b)`);
-                    score = 0; // 점수 초기화
-                    updateDisplay();
-                }, 2000);
+                const decimals = await tokenContract.decimals();
+                const parseAmount = ethers.utils.parseUnits(amount, decimals);
+
+                // 자기 자신에게 보내기 (Loopback Test)
+                const tx = await tokenContract.transfer(userAddress, parseAmount);
+                
+                alert(">>> [전송 시작] 블록체인에 기록 중입니다...\nHash: " + tx.hash);
+                
+                await tx.wait(); // 완료 대기
+                alert("✅ [전송 성공] 블록체인 거래가 확정되었습니다!");
+                
+                updateRealBalance(); // 잔액 갱신
+
+            } catch (err) {
+                alert("전송 취소 또는 실패: " + err.message);
             }
         }
-
-        // 5. [화면 갱신]
-        function updateDisplay() {
-            document.getElementById("score-display").innerText = score.toFixed(4) + " ADVC";
-
-            // 10개 돌파 시 인출 버튼 활성화
-            if(score >= 10) {
-                const display = document.getElementById("score-display");
-                display.style.color = "#00FF00";
-                display.style.textShadow = "0 0 20px #00FF00";
-                document.getElementById("score-sub").innerText = "🎉 TARGET REACHED! (인출 가능)";
-                
-                const btn = document.getElementById("claim-btn");
-                btn.style.borderColor = "#00FF00";
-                btn.style.color = "#00FF00";
-                btn.style.boxShadow = "0 0 15px #00FF00";
-                btn.onclick = requestClaim; // 인출 함수 연결
-            }
-        }
-
-        window.onload = startBotSync;
     </script>
 </body>
 </html>

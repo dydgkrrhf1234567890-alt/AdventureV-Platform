@@ -118,36 +118,30 @@
         const miningRate = 0.0015;
         let userAccount = null;
 
-        // 1. [핵심] 지갑 연결 함수 (MetaMask)
+        // 1. [지갑 연결] 메타마스크 연동
         async function connectWallet() {
             if (window.ethereum) {
                 try {
-                    // 메타마스크에게 계정 요청
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     userAccount = accounts[0];
                     
-                    // 버튼을 지갑 주소로 변경 (간지나게)
                     const btn = document.getElementById("connect-btn");
                     btn.innerText = "🦊 Connected: " + userAccount.substring(0,6) + "..." + userAccount.substring(38);
                     btn.style.borderColor = "#00FF00";
                     btn.style.color = "#00FF00";
-                    btn.style.boxShadow = "0 0 10px #00FF00";
+                    btn.style.boxShadow = "0 0 15px #00FF00";
                     
-                    alert(">>> [ACCESS GRANTED] 왕자님, 지갑이 연결되었습니다! 자산 전송 준비 완료.");
-                    console.log("Connected Account:", userAccount);
-
+                    alert(">>> [SYSTEM] 지갑 연결 성공! 왕자님을 환영합니다.");
                 } catch (error) {
-                    console.error(error);
-                    alert("연결이 거부되었습니다.");
+                    alert("연결이 취소되었습니다.");
                 }
             } else {
-                alert("메타마스크(MetaMask)가 설치되어 있지 않습니다! 앱을 설치해주세요.");
+                alert("메타마스크(MetaMask) 앱이 필요합니다!");
             }
         }
 
         // 2. [자동 채굴] 봇 동기화
         function startBotSync() {
-            console.log(">>> [Genesis Sync] Bot Connection Established.");
             setInterval(() => {
                 score += miningRate;
                 updateDisplay();
@@ -158,16 +152,35 @@
         function mineToken() {
             score += 0.5;
             updateDisplay();
-            
             const core = document.querySelector('.ai-core');
             core.style.transform = "scale(0.95)";
             setTimeout(() => core.style.transform = "scale(1)", 100);
         }
 
-        // 4. [화면 갱신]
+        // 4. [인출 시스템] - 전송 시뮬레이션
+        async function requestClaim() {
+            if(!userAccount) {
+                alert("⛔ 먼저 지갑을 연결해야 합니다!");
+                return;
+            }
+            
+            if(confirm(`[출금 요청]\n\n수령인: ${userAccount}\n수량: ${score.toFixed(4)} ADVC\n\n승인하시겠습니까?`)) {
+                alert(">>> [Processing] 블록체인 승인 대기 중...");
+                
+                // 2초 뒤 전송 완료 연출
+                setTimeout(() => {
+                    alert(`✅ [SUCCESS] 전송 완료!\n\n${score.toFixed(4)} ADVC가 지갑으로 전송되었습니다.\n(Transaction Hash: 0x7f...3a2b)`);
+                    score = 0; // 점수 초기화
+                    updateDisplay();
+                }, 2000);
+            }
+        }
+
+        // 5. [화면 갱신]
         function updateDisplay() {
             document.getElementById("score-display").innerText = score.toFixed(4) + " ADVC";
 
+            // 10개 돌파 시 인출 버튼 활성화
             if(score >= 10) {
                 const display = document.getElementById("score-display");
                 display.style.color = "#00FF00";
@@ -177,13 +190,8 @@
                 const btn = document.getElementById("claim-btn");
                 btn.style.borderColor = "#00FF00";
                 btn.style.color = "#00FF00";
-                btn.onclick = function() { 
-                    if(userAccount) {
-                        alert(">>> [SYSTEM] " + userAccount + " 주소로 전송을 시작합니다... (가스비 필요)");
-                    } else {
-                        alert("지갑을 먼저 연결해주세요!");
-                    }
-                };
+                btn.style.boxShadow = "0 0 15px #00FF00";
+                btn.onclick = requestClaim; // 인출 함수 연결
             }
         }
 

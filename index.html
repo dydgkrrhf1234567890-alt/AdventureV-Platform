@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADVC Empire Protocol (Real-Net)</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript"></script>
+    
     <style>
         body {
             background-color: #050505;
@@ -20,14 +22,12 @@
         h1 { font-size: 2.0rem; text-shadow: 0 0 15px #00ffcc; margin-bottom: 5px; }
         .container { width: 90%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; align-items: center; margin-top: 80px; }
         
-        /* 점수판 스타일 */
         .score-board {
             font-size: 2.0rem; color: #ffd700; text-shadow: 0 0 10px #ffd700;
             margin: 20px 0 5px 0; font-weight: bold; word-break: break-all;
         }
         .score-sub { font-size: 0.8rem; color: #666; margin-bottom: 30px; }
         
-        /* AI 코어 */
         .ai-core {
             width: 150px; height: 150px;
             background: radial-gradient(circle at 30% 30%, #ff00cc, #660066);
@@ -37,12 +37,11 @@
         }
         .ai-core:active { transform: scale(0.95); }
         
-        /* 버튼 */
         #connect-btn, #claim-btn {
             background: transparent; border: 1px solid #ff6600; color: #ff6600;
             padding: 10px 20px; cursor: pointer; font-family: inherit; margin-bottom: 20px; border-radius: 5px; font-weight: bold;
         }
-        #claim-btn { border-color: #333; color: #555; pointer-events: none; } /* 처음엔 비활성 */
+        #claim-btn { border-color: #333; color: #555; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -61,14 +60,11 @@
 
         <button id="claim-btn" onclick="sendTestTransaction()">💸 Test Transaction (전송 테스트)</button>
 
-        <div class="ai-core" onclick="alert('채굴 기능은 리얼 모드에서 자동화됩니다!')"></div>
+        <div class="ai-core" onclick="alert('리얼 모드에서는 자동 채굴 기능이 블록체인 속도에 맞춰집니다.')"></div>
     </div>
 
     <script>
-        // 1. 왕자님의 진짜 토큰 주소 (수정 금지)
         const tokenAddress = "0x5b41e1f16507834B42E503e79761dd2CC218Cb5A"; 
-        
-        // 최소한의 기능(잔액 조회, 전송)을 위한 ABI
         const tokenABI = [
             "function balanceOf(address owner) view returns (uint256)",
             "function decimals() view returns (uint8)",
@@ -77,8 +73,13 @@
 
         let provider, signer, tokenContract, userAddress;
 
-        // 2. [지갑 연결] & [잔액 조회]
         async function connectWallet() {
+            // 도구가 잘 로딩됐는지 확인
+            if (typeof ethers === 'undefined') {
+                alert("⚠ 연결 도구(Ethers.js)가 아직 로딩되지 않았습니다. 3초 뒤에 다시 눌러주세요!");
+                return;
+            }
+
             if (window.ethereum) {
                 try {
                     provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -86,18 +87,13 @@
                     signer = provider.getSigner();
                     userAddress = await signer.getAddress();
 
-                    // 버튼 꾸미기
                     const btn = document.getElementById("connect-btn");
                     btn.innerText = "🦊 Connected: " + userAddress.substring(0,6) + "...";
                     btn.style.borderColor = "#00FF00"; btn.style.color = "#00FF00";
 
-                    // 계약 연결
                     tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
-                    
-                    // 진짜 잔액 가져오기
                     updateRealBalance();
 
-                    // 전송 버튼 활성화
                     const claimBtn = document.getElementById("claim-btn");
                     claimBtn.style.borderColor = "#ffd700"; claimBtn.style.color = "#ffd700";
                     claimBtn.style.pointerEvents = "auto";
@@ -110,48 +106,37 @@
             }
         }
 
-        // 3. [진짜 잔액 불러오기]
         async function updateRealBalance() {
             try {
                 const balance = await tokenContract.balanceOf(userAddress);
                 const decimals = await tokenContract.decimals();
                 const formattedBalance = ethers.utils.formatUnits(balance, decimals);
                 
-                // 화면에 표시 (소수점 2자리까지만 예쁘게)
-                // 숫자가 너무 크면 콤마(,) 찍기
-                const displayNum = parseFloat(formattedBalance).toLocaleString(undefined, {maximumFractionDigits: 2});
+                // 콤마 찍어서 예쁘게 보여주기
+                const displayNum = Number(formattedBalance).toLocaleString(undefined, {maximumFractionDigits: 2});
                 
                 document.getElementById("balance-display").innerText = displayNum + " ADVC";
-                document.getElementById("status-msg").innerText = "Blockchain Verification Complete (Real Asset)";
+                document.getElementById("status-msg").innerText = "✅ Blockchain Verified (Real Asset)";
             } catch (err) {
                 console.error(err);
-                document.getElementById("balance-display").innerText = "Error";
+                document.getElementById("balance-display").innerText = "Error (Network Busy)";
             }
         }
 
-        // 4. [전송 테스트] - 나 자신에게 0.001 ADVC 보내기 (가스비 확인용)
         async function sendTestTransaction() {
             if(!tokenContract) return;
-            
             const amount = prompt("테스트로 전송할 ADVC 수량을 입력하세요:", "0.1");
             if(!amount) return;
 
             try {
                 alert(">>> [메타마스크 확인 필요]\n가스비(POL) 승인 창이 뜨면 '확인'을 눌러주세요.");
-                
                 const decimals = await tokenContract.decimals();
                 const parseAmount = ethers.utils.parseUnits(amount, decimals);
-
-                // 자기 자신에게 보내기 (Loopback Test)
                 const tx = await tokenContract.transfer(userAddress, parseAmount);
-                
                 alert(">>> [전송 시작] 블록체인에 기록 중입니다...\nHash: " + tx.hash);
-                
-                await tx.wait(); // 완료 대기
+                await tx.wait();
                 alert("✅ [전송 성공] 블록체인 거래가 확정되었습니다!");
-                
-                updateRealBalance(); // 잔액 갱신
-
+                updateRealBalance();
             } catch (err) {
                 alert("전송 취소 또는 실패: " + err.message);
             }

@@ -49,15 +49,8 @@
             margin-top: 20px;
         }
         
-        /* 지갑 상태 표시용 */
-        .wallet-box {
-            font-size: 12px;
-            color: #aaa;
-            margin-bottom: 10px;
-        }
-        #connectBtn {
-            background: #4caf50; /* 초록색 버튼 */
-        }
+        .wallet-box { font-size: 12px; color: #aaa; margin-bottom: 10px; }
+        #connectBtn { background: #4caf50; }
     </style>
 </head>
 <body>
@@ -91,7 +84,7 @@
         let score = 0;
         let userAccount = null;
 
-        // 1. 몬스터 공격 로직
+        // 1. 몬스터 공격
         function attack() {
             if (hp > 0) {
                 hp -= 10;
@@ -116,34 +109,38 @@
             }
         }
 
-        // 2. 지갑 연결 로직 (마리네의 마법!)
+        // 2. 지갑 연결
         async function connectWallet() {
             if (window.ethereum) {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     userAccount = accounts[0];
-                    
                     document.getElementById("walletStatus").innerHTML = "🟢 Connected: " + userAccount.substring(0,6) + "...";
                     document.getElementById("connectBtn").style.display = "none";
-                    alert("Wallet Connected Successfully!");
-                } catch (error) {
-                    alert("Connection Failed!");
-                }
-            } else {
-                alert("Please open this in MetaMask Browser!");
-            }
+                } catch (error) { alert("Connection Failed!"); }
+            } else { alert("Please use MetaMask Browser!"); }
         }
 
-        // 3. 보상 청구 로직 (지갑 체크)
+        // 3. 보상 청구 (UI 리셋 기능 탑재!)
         function claimRewards() {
             if (!userAccount) {
                 alert("⚠️ Please Connect Wallet first!");
-            } else if (score === 0) {
-                alert("⚠️ You need to earn some points first!");
-            } else {
-                // 진짜 코인 전송은 스마트 컨트랙트가 필요해서 아직은 시늉만!
-                alert("🎉 Claim Request Sent for " + score + " ADVC to " + userAccount.substring(0,6) + "...");
+                return;
+            } 
+            
+            if (score === 0) {
+                alert("⚠️ Earn points first!");
+                return;
             }
+
+            // [중요] 나중에 여기에 '스마트 컨트랙트 호출 코드'를 넣을 거예요!
+            // 지금은 화면상에서 점수를 0으로 만드는 기능만 작동합니다.
+            alert("🎉 [System] Requesting " + score + " ADVC Payment...");
+            
+            score = 0; 
+            document.getElementById("score").innerText = score; 
+            document.getElementById("msg").innerText = "Waiting for Transaction...";
+            document.getElementById("msg").style.color = "yellow";
         }
     </script>
 

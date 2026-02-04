@@ -3,146 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADVC Battle Arena</title>
+    <title>ADVC Battle Arena - Web3</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
-        body {
-            background-color: #120a1f;
-            color: white;
-            font-family: 'Verdana', sans-serif;
-            text-align: center;
-            user-select: none;
-        }
-        .container {
-            max-width: 500px;
-            margin: 20px auto;
-            border: 3px solid #ff0055;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 0 30px #ff0055;
-        }
+        body { background-color: #120a1f; color: white; font-family: 'Verdana', sans-serif; text-align: center; user-select: none; }
+        .container { max-width: 500px; margin: 20px auto; border: 3px solid #ff0055; border-radius: 20px; padding: 20px; box-shadow: 0 0 30px #ff0055; }
         h1 { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
-        
-        #monster {
-            font-size: 100px;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
+        #monster { font-size: 100px; cursor: pointer; transition: transform 0.1s; }
         #monster:active { transform: scale(0.9); }
-
-        .stats {
-            background: #221a36;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 10px 0;
-            border: 1px solid #555;
-        }
+        .stats { background: #221a36; padding: 10px; border-radius: 10px; margin: 10px 0; border: 1px solid #555; }
         .reward-text { color: #00ffcc; font-weight: bold; font-size: 20px; }
-        
-        .btn {
-            background: linear-gradient(45deg, #ff0055, #ffcc00);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        
+        .btn { background: linear-gradient(45deg, #ff0055, #ffcc00); border: none; color: white; padding: 10px 20px; border-radius: 30px; font-size: 16px; cursor: pointer; margin-top: 20px; }
         .wallet-box { font-size: 12px; color: #aaa; margin-bottom: 10px; }
-        #connectBtn { background: #4caf50; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>⚔️ ADVC Monster Hunt</h1>
-        
         <div class="wallet-box">
             <p id="walletStatus">🔴 Wallet Not Connected</p>
             <button id="connectBtn" class="btn" onclick="connectWallet()">🦊 Connect Wallet</button>
         </div>
-
         <hr style="border-color:#333; margin:20px 0;">
-
-        <p>Tap the Monster to Earn ADVC!</p>
-
         <div class="stats">
             <p>HP: <span id="hp" style="color:red;">100</span> / 100</p>
             <p>💰 Earned: <span id="score" class="reward-text">0</span> ADVC</p>
         </div>
-
         <div id="monster" onclick="attack()">👾</div>
-
-        <p id="msg" style="color:gray; height:20px;">...</p>
-
-        <button class="btn" onclick="claimRewards()">Claim Rewards</button>
+        <p id="msg" style="color:gray; height:20px;">Tap the monster!</p>
+        <button id="claimBtn" class="btn" onclick="claimRewards()" style="display:none;">Claim 10 ADVC Now!</button>
     </div>
 
     <script>
+        // ★ 왕자님의 진짜 기계 주소 ★
+        const contractAddress = "0x4F5dF89Ff0b4a45F6e5507834B42E503e79761dd2CC218Cb5A"; 
+        const abi = ["function claimReward() public"];
+
         let hp = 100;
         let score = 0;
-        let userAccount = null;
+        let provider, signer, contract;
 
-        // 1. 몬스터 공격
         function attack() {
             if (hp > 0) {
-                hp -= 10;
+                hp -= 20;
                 document.getElementById("hp").innerText = hp;
-                document.getElementById("monster").style.transform = "scale(0.9)";
-                setTimeout(() => document.getElementById("monster").style.transform = "scale(1)", 100);
-                if (navigator.vibrate) navigator.vibrate(50);
-            }
-
-            if (hp <= 0) {
-                score += 10;
-                document.getElementById("score").innerText = score;
-                document.getElementById("msg").innerText = "✨ Monster Defeated! +10 ADVC ✨";
-                document.getElementById("msg").style.color = "#00ffcc";
-                
-                setTimeout(() => {
+                if (hp <= 0) {
+                    score += 10;
+                    document.getElementById("score").innerText = score;
+                    document.getElementById("msg").innerText = "✨ Defeated! You can claim now! ✨";
+                    document.getElementById("claimBtn").style.display = "inline-block";
                     hp = 100;
-                    document.getElementById("hp").innerText = hp;
-                    document.getElementById("msg").innerText = "A new monster appeared!";
-                    document.getElementById("msg").style.color = "gray";
-                }, 1000);
+                }
             }
         }
 
-        // 2. 지갑 연결
         async function connectWallet() {
             if (window.ethereum) {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAccount = accounts[0];
-                    document.getElementById("walletStatus").innerHTML = "🟢 Connected: " + userAccount.substring(0,6) + "...";
-                    document.getElementById("connectBtn").style.display = "none";
-                } catch (error) { alert("Connection Failed!"); }
-            } else { alert("Please use MetaMask Browser!"); }
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                contract = new ethers.Contract(contractAddress, abi, signer);
+                const addr = await signer.getAddress();
+                document.getElementById("walletStatus").innerText = "🟢 Connected: " + addr.substring(0,6) + "...";
+                document.getElementById("connectBtn").style.display = "none";
+            } else { alert("MetaMask required!"); }
         }
 
-        // 3. 보상 청구 (UI 리셋 기능 탑재!)
-        function claimRewards() {
-            if (!userAccount) {
-                alert("⚠️ Please Connect Wallet first!");
-                return;
-            } 
-            
-            if (score === 0) {
-                alert("⚠️ Earn points first!");
-                return;
+        async function claimRewards() {
+            if (!contract) return alert("Connect Wallet First!");
+            try {
+                document.getElementById("msg").innerText = "⏳ Processing on Blockchain...";
+                const tx = await contract.claimReward(); // 진짜 코인 쏘는 명령!
+                await tx.wait(); // 블록체인 확정 기다리기
+                alert("🎉 Success! 10 ADVC sent to your wallet!");
+                score = 0;
+                document.getElementById("score").innerText = score;
+                document.getElementById("claimBtn").style.display = "none";
+                document.getElementById("msg").innerText = "Monster revived!";
+            } catch (err) {
+                console.error(err);
+                alert("Transaction Failed! (Check ADVC in contract)");
+                document.getElementById("msg").innerText = "Error occurred.";
             }
-
-            // [중요] 나중에 여기에 '스마트 컨트랙트 호출 코드'를 넣을 거예요!
-            // 지금은 화면상에서 점수를 0으로 만드는 기능만 작동합니다.
-            alert("🎉 [System] Requesting " + score + " ADVC Payment...");
-            
-            score = 0; 
-            document.getElementById("score").innerText = score; 
-            document.getElementById("msg").innerText = "Waiting for Transaction...";
-            document.getElementById("msg").style.color = "yellow";
         }
     </script>
-
 </body>
 </html>

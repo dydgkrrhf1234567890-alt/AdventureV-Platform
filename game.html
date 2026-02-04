@@ -10,7 +10,7 @@
             color: white;
             font-family: 'Verdana', sans-serif;
             text-align: center;
-            user-select: none; /* 드래그 방지 */
+            user-select: none;
         }
         .container {
             max-width: 500px;
@@ -22,13 +22,12 @@
         }
         h1 { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
         
-        /* 몬스터 디자인 */
         #monster {
             font-size: 100px;
             cursor: pointer;
             transition: transform 0.1s;
         }
-        #monster:active { transform: scale(0.9); } /* 클릭 효과 */
+        #monster:active { transform: scale(0.9); }
 
         .stats {
             background: #221a36;
@@ -49,12 +48,30 @@
             cursor: pointer;
             margin-top: 20px;
         }
+        
+        /* 지갑 상태 표시용 */
+        .wallet-box {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        #connectBtn {
+            background: #4caf50; /* 초록색 버튼 */
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>⚔️ ADVC Monster Hunt</h1>
+        
+        <div class="wallet-box">
+            <p id="walletStatus">🔴 Wallet Not Connected</p>
+            <button id="connectBtn" class="btn" onclick="connectWallet()">🦊 Connect Wallet</button>
+        </div>
+
+        <hr style="border-color:#333; margin:20px 0;">
+
         <p>Tap the Monster to Earn ADVC!</p>
 
         <div class="stats">
@@ -66,38 +83,66 @@
 
         <p id="msg" style="color:gray; height:20px;">...</p>
 
-        <button class="btn" onclick="alert('Withdraw feature coming soon!')">Claim Rewards</button>
+        <button class="btn" onclick="claimRewards()">Claim Rewards</button>
     </div>
 
     <script>
         let hp = 100;
         let score = 0;
+        let userAccount = null;
 
+        // 1. 몬스터 공격 로직
         function attack() {
             if (hp > 0) {
-                hp -= 10; // 클릭당 데미지 10
+                hp -= 10;
                 document.getElementById("hp").innerText = hp;
                 document.getElementById("monster").style.transform = "scale(0.9)";
                 setTimeout(() => document.getElementById("monster").style.transform = "scale(1)", 100);
-                
-                // 타격 효과음 (진동)
-                if (navigator.vibrate) navigator.vibrate(50); 
+                if (navigator.vibrate) navigator.vibrate(50);
             }
 
             if (hp <= 0) {
-                // 몬스터 처치!
-                score += 10; // 보상 10 ADVC
+                score += 10;
                 document.getElementById("score").innerText = score;
                 document.getElementById("msg").innerText = "✨ Monster Defeated! +10 ADVC ✨";
                 document.getElementById("msg").style.color = "#00ffcc";
                 
-                // 몬스터 부활 (리셋)
                 setTimeout(() => {
                     hp = 100;
                     document.getElementById("hp").innerText = hp;
                     document.getElementById("msg").innerText = "A new monster appeared!";
                     document.getElementById("msg").style.color = "gray";
                 }, 1000);
+            }
+        }
+
+        // 2. 지갑 연결 로직 (마리네의 마법!)
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0];
+                    
+                    document.getElementById("walletStatus").innerHTML = "🟢 Connected: " + userAccount.substring(0,6) + "...";
+                    document.getElementById("connectBtn").style.display = "none";
+                    alert("Wallet Connected Successfully!");
+                } catch (error) {
+                    alert("Connection Failed!");
+                }
+            } else {
+                alert("Please open this in MetaMask Browser!");
+            }
+        }
+
+        // 3. 보상 청구 로직 (지갑 체크)
+        function claimRewards() {
+            if (!userAccount) {
+                alert("⚠️ Please Connect Wallet first!");
+            } else if (score === 0) {
+                alert("⚠️ You need to earn some points first!");
+            } else {
+                // 진짜 코인 전송은 스마트 컨트랙트가 필요해서 아직은 시늉만!
+                alert("🎉 Claim Request Sent for " + score + " ADVC to " + userAccount.substring(0,6) + "...");
             }
         }
     </script>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADVC Battle Arena</title>
+    <style>
+        body {
+            background-color: #120a1f;
+            color: white;
+            font-family: 'Verdana', sans-serif;
+            text-align: center;
+            user-select: none; /* 드래그 방지 */
+        }
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            border: 3px solid #ff0055;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 30px #ff0055;
+        }
+        h1 { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
+        
+        /* 몬스터 디자인 */
+        #monster {
+            font-size: 100px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        #monster:active { transform: scale(0.9); } /* 클릭 효과 */
+
+        .stats {
+            background: #221a36;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border: 1px solid #555;
+        }
+        .reward-text { color: #00ffcc; font-weight: bold; font-size: 20px; }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff0055, #ffcc00);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>⚔️ ADVC Monster Hunt</h1>
+        <p>Tap the Monster to Earn ADVC!</p>
+
+        <div class="stats">
+            <p>HP: <span id="hp" style="color:red;">100</span> / 100</p>
+            <p>💰 Earned: <span id="score" class="reward-text">0</span> ADVC</p>
+        </div>
+
+        <div id="monster" onclick="attack()">👾</div>
+
+        <p id="msg" style="color:gray; height:20px;">...</p>
+
+        <button class="btn" onclick="alert('Withdraw feature coming soon!')">Claim Rewards</button>
+    </div>
+
+    <script>
+        let hp = 100;
+        let score = 0;
+
+        function attack() {
+            if (hp > 0) {
+                hp -= 10; // 클릭당 데미지 10
+                document.getElementById("hp").innerText = hp;
+                document.getElementById("monster").style.transform = "scale(0.9)";
+                setTimeout(() => document.getElementById("monster").style.transform = "scale(1)", 100);
+                
+                // 타격 효과음 (진동)
+                if (navigator.vibrate) navigator.vibrate(50); 
+            }
+
+            if (hp <= 0) {
+                // 몬스터 처치!
+                score += 10; // 보상 10 ADVC
+                document.getElementById("score").innerText = score;
+                document.getElementById("msg").innerText = "✨ Monster Defeated! +10 ADVC ✨";
+                document.getElementById("msg").style.color = "#00ffcc";
+                
+                // 몬스터 부활 (리셋)
+                setTimeout(() => {
+                    hp = 100;
+                    document.getElementById("hp").innerText = hp;
+                    document.getElementById("msg").innerText = "A new monster appeared!";
+                    document.getElementById("msg").style.color = "gray";
+                }, 1000);
+            }
+        }
+    </script>
+
+</body>
+</html>

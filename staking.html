@@ -6,7 +6,7 @@
     <title>ADVC Staking Protocol</title>
     <style>
         body {
-            background-color: #0a0a12; /* Deep Space Dark */
+            background-color: #0a0a12;
             color: #ffffff;
             font-family: 'Courier New', monospace;
             text-align: center;
@@ -15,7 +15,7 @@
         .container {
             max-width: 600px;
             margin: 0 auto;
-            border: 2px solid #8a2be2; /* ADVC Purple */
+            border: 2px solid #8a2be2;
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 0 20px #8a2be2;
@@ -51,6 +51,7 @@
             text-align: center;
             font-size: 16px;
         }
+        #walletAddress { font-size: 12px; color: #888; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -60,8 +61,9 @@
         <p>Deposit ADVC, Earn 20% APY Rewards</p>
 
         <div class="stat-box">
-            <p>🔴 Wallet Status: <span id="walletStatus" style="color:red;">Disconnected</span></p>
-            <p>💰 My Balance: <span id="myBalance">0</span> ADVC</p>
+            <p id="statusText">🔴 Wallet Status: <span style="color:red;">Disconnected</span></p>
+            <p id="walletAddress"></p>
+            <button class="btn" id="connectBtn" onclick="connectWallet()">🦊 Connect Wallet</button>
         </div>
 
         <hr style="border-color: #333;">
@@ -70,7 +72,7 @@
             <h3>🔒 Staking Vault</h3>
             <input type="number" class="input-field" placeholder="Amount to Stake (ADVC)">
             <br>
-            <button class="btn" onclick="alert('Connect Wallet First!')">DEPOSIT</button>
+            <button class="btn" onclick="alert('Staking logic coming soon!')">DEPOSIT</button>
         </div>
 
         <div class="stat-box">
@@ -78,12 +80,32 @@
             <button style="background:none; border:1px solid #00ffcc; color:#00ffcc; padding:5px 10px; border-radius:5px; cursor:pointer;">Claim Rewards</button>
         </div>
         
-        <p style="font-size:12px; color:gray; margin-top:20px;">Powered by AdventureV Protocol V2.0</p>
+        <p style="font-size:12px; color:gray; margin-top:20px;">Powered by AdventureV Protocol V2.1</p>
     </div>
 
     <script>
-        // 여기에 나중에 Web3 연결 마법(자바스크립트)을 넣을 거예요!
-        console.log("ADVC Staking System Initialized...");
+        // 마리네의 마법 주문: 메타마스크 소환술!
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    // 메타마스크에게 '계정 연결 요청' 보내기
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0];
+                    
+                    // 화면 바꾸기 (성공 시)
+                    document.getElementById("statusText").innerHTML = "🟢 Wallet Status: <span style='color:#00ffcc;'>Connected</span>";
+                    document.getElementById("walletAddress").innerText = "Address: " + account;
+                    document.getElementById("connectBtn").style.display = "none"; // 연결 버튼 숨기기
+                    
+                    alert("Success! Wallet Connected: " + account.substring(0,6) + "...");
+                } catch (error) {
+                    console.error(error);
+                    alert("Connection Failed! Please allow access.");
+                }
+            } else {
+                alert("MetaMask not found! Please install it.");
+            }
+        }
     </script>
 
 </body>
